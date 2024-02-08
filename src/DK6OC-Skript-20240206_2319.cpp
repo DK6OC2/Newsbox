@@ -63,6 +63,7 @@ void setup()
      WiFiClient client;
      HTTPClient http;
 
+// das ab hier muss in die Loop
     // Abfrage der Info.txt Datei auf OV-Server mit http-Client
     Serial.print("Fetching ... ");
     http.begin(client, URL); // http.begin(URL);
@@ -90,7 +91,7 @@ void setup()
 void loop()
 {
   // Nachricht generieren, aufteilen und anzeigen
-
+// hier sollten wir noch eine Abfrage einbauen und das Display nur anpacken, wenn sich die Nachricht geändert hat.
   if (payload_length > 16)
   {
     int Trennen = payload.indexOf(";");
@@ -112,6 +113,6 @@ void loop()
   }
 
   // WHAT THE FUCK ??????
-  delay(12000);
-  ESP.restart();
+  delay(12000); // das soll die Wartezeit bis zur nächsten loop sein. wir sollten lieber die Abfrage in eine Schleife packen, die nur aller paar Minuten läuft (mit millis)
+  ESP.restart(); // das muss weg
 }
