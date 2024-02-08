@@ -5,8 +5,8 @@
 #include <ESP8266HTTPClient.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für andere Displays oder // Adressen anzupassen
-const char* WIFI_SSID = "IKS-2.4";                  // Name des eigenen WLAN
-const char* WIFI_PASSWORD = "90563549770968987168"; // Passwort eigenes WLAN
+const char* WIFI_SSID = "your-ssid";                  // Name des eigenen WLAN
+const char* WIFI_PASSWORD = "your-password"; // Passwort eigenes WLAN
 const char* host = "www.r04-afu.de";                // Link zum OV-Server
 
 const String URL = "http:/www.r04-afu.de/info.txt";
