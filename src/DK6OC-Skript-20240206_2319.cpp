@@ -1,3 +1,4 @@
+//Version: 2024.06.01 (Jahr.Woche.lfd.Nr.)
 // Bibliotheken laden, WLAN einstellen und Links festlegen
 #include <ESP8266WiFi.h>
 #include <Wire.h>
