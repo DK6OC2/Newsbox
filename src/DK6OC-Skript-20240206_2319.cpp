@@ -17,18 +17,20 @@ const String payload = "Nachricht laden";
 const String MESSAGE1;
 const String MESSAGE2;
 
-int MESSAGE_LENGTH = 100;     // Länge der Nachricht
-const int DISPLAY_WIDTH = 16; // Definition fürs Display
-
-int payload_length; // Variable für die Länge des Textes vom Server definieren
-int cnt = 3600;     // Zählervariable
-
 String Locator = "JO31ke"; // eigener Locator
 
 // feste IP einstellen
 IPAddress ip(192, 168, 2, 8);       // feste IP-Adresse im eigenen Netz
 IPAddress gateway(192, 168, 2, 1);  // Gateway-Adresse im eigenen Netz
 IPAddress subnet(255, 255, 255, 0); // Subnet IP-Adresse im eigenen Netz
+
+int MESSAGE_LENGTH = 100;     // Länge der Nachricht
+const int DISPLAY_WIDTH = 16; // Definition fürs Display
+
+int payload_length; // Variable für die Länge des Textes vom Server definieren
+int cnt = 3600;     // Zählervariable
+
+
 
 // LCD initialisieren und Starttexte an-zeigen
 void setup()
