@@ -22,10 +22,10 @@ void setup()
 {
   // Start Serial
   Serial.begin(9600);
-  Serial.setTimeout(3000); // miliseconds to wait (50 mili) for USB Data. Default 1000
+  Serial.setTimeout(1000); // miliseconds to wait (50 mili) for USB Data. Default 1000
 
   // LCD
-  //lcd.begin(0, 2);
+  //lcd.begin(0, 2); //je nach Display ggf. statt init()
   lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
