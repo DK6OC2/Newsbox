@@ -10,7 +10,6 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für andere Displays oder
 int MESSAGE_LENGTH = 100;     // Länge der Nachricht
 const int DISPLAY_WIDTH = 16; // Definition fürs Display
 String payload; // Variable für Nachricht
-String message;
 String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
@@ -50,9 +49,9 @@ const char* rootCACertificate = \
      "-----END CERTIFICATE-----\n";
 
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
-WiFiClientSecure *client = new WiFiClientSecure ;
+WiFiClientSecure *client = new WiFiClientSecure ; // initialisieren des WifiClients mit SSL
 
-// LCD initialisieren und Starttexte an-zeigen
+// LCD initialisieren und Starttexte anzeigen
 void setup()
 {
   // Start Serial
@@ -69,6 +68,7 @@ void setup()
   lcd.print(Locator);
   lcd.setCursor(0, 1);
   lcd.print(OV);
+//WiFi-Parameter setzen und verbinden
  if (!WiFi.config(ip, gateway, subnet, primaryDNS, secondaryDNS)) {
   Serial.println("STA Failed to configure");
 }
@@ -88,57 +88,63 @@ void setup()
 void loop()
 {
   client->setCACert(rootCACertificate) ; // Set Server-Certificate
-  HTTPClient http ;
+  HTTPClient http ; //Webclient starten
+  //Nachricht holen, wenn erster Durchlauf oder Intervall abgelaufen ist
   if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
     {
     Serial.println("Fetching ... "+URL);
-    http.begin(*client, URL); // http.begin(URL);
+    http.begin(*client, URL); //Verbindung zum Server aufbauen
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     // Send HTTP GET request
     int httpResponseCode = http.GET();
 
     if (httpResponseCode > 0)
     {
-      payload = http.getString();
-      Serial.println(payload); // Print re-sponse
-      payload_length = payload.length();
+      payload = http.getString(); // Abruf Textdatei
+      Serial.println(payload); // Print response
+      payload_length = payload.length(); //Nachrichtenlänge bestimmen
       Serial.println("Laenge: ");
       Serial.println(payload_length);
     } 
     else 
     {
+        //Fehlermeldung für Debugzwecke
         Serial.print("Error code: ");
         Serial.println(httpResponseCode);
     }
     // Free resources
     http.end();
-    fetchmessage = false;
-    startTime = 0;
+    fetchmessage = false; // Pause für den Abruf
+    startTime = 0; // Startzeit für Abruf zurücksetzen
     } 
   if (payload != old_payload)  //bei neuer Nachricht auf dem Server
      {
+     payload = payload.substring(0, (payload_length -1)); //entferne endzeichen
       // Nachricht generieren, aufteilen und anzeigen
-      if (payload_length > 16)
+      if (payload_length > 16) //Wenn zweizeilige Nachricht
         {
-        payload = payload.substring(0, (payload_length -1)); //entferne endzeichen
         int Trennen = payload.indexOf(";");
-        String MESSAGE1 = payload.substring(0, (Trennen));
+        String MESSAGE1 = payload.substring(0, (Trennen)); //Trenne am Semicolon
         int temp_var = payload.indexOf(";");
         String MESSAGE2 = payload.substring(temp_var + 1);
+        //Schreibe Nachricht aufs Display wenn 2-zeilig
         lcd.setCursor(0, 0);
         lcd.print(MESSAGE1);
         lcd.setCursor(0, 1);
         lcd.print(MESSAGE2);
         }
-      else
+      else // wenn Nachricht kürzer als 16 Zeichen
         {
+        //schreibe einzeilige Nachricht aufs display
         lcd.setCursor(0, 0);
         lcd.print(payload);
+        lcd.setCursor(0, 1);
+        lcd.print("                "); //lösche mögliche Rückstände in Zeile 2
         }
       old_payload = payload ; //Sichere alte Nachricht zum Vergleich
      } 
     if (millis() - startTime >= interval)
       {
-        fetchmessage = true; //wenn Interval um hole neue Nachricht vom Server
+        fetchmessage = true; //wenn Interval um, hole neue Nachricht vom Server in der nächsten loop
       }
 }
