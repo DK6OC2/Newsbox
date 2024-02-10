@@ -1,7 +1,7 @@
-#include <ESP8266WiFi.h>
+#include <WiFi.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
-#include <ESP8266HTTPClient.h>
+#include <HTTPClient.h>
 #include <config.h>
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für andere Displays oder // Adressen anzupassen
@@ -15,7 +15,8 @@ unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
-
+WiFiClient client;
+HTTPClient http;
 // LCD initialisieren und Starttexte an-zeigen
 void setup()
 {
@@ -24,7 +25,8 @@ void setup()
   Serial.setTimeout(3000); // miliseconds to wait (50 mili) for USB Data. Default 1000
 
   // LCD
-  lcd.begin(0, 2);
+  //lcd.begin(0, 2);
+  lcd.init();
   lcd.backlight();
   lcd.setCursor(0, 0);
   lcd.print(Rufzeichen);
@@ -32,7 +34,9 @@ void setup()
   lcd.print(Locator);
   lcd.setCursor(0, 1);
   lcd.print(OV);
-
+ if (!WiFi.config(ip, gateway, subnet, primaryDNS, secondaryDNS)) {
+  Serial.println("STA Failed to configure");
+}
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
@@ -45,15 +49,14 @@ void setup()
   Serial.println(WiFi.localIP());
 
 
-  if(WiFi.status()== WL_CONNECTED){
-     WiFiClient client;
-     HTTPClient http;
+  
+     
+  }
 
-}
 
 void loop()
 {
-  if (fetchmessage)
+  if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
     {
     Serial.print("Fetching ... ");
     http.begin(client, URL); // http.begin(URL);
@@ -68,7 +71,9 @@ void loop()
       payload_length = payload.length();
       Serial.println("Laenge: ");
       Serial.println(payload_length);
-    } else {
+    } 
+    else 
+    {
         Serial.print("Error code: ");
         Serial.println(httpResponseCode);
     }
@@ -102,3 +107,4 @@ void loop()
       {
         fetchmessage = true; //wenn Interval um hole neue Nachricht vom Server
       }
+}
