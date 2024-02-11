@@ -5,9 +5,11 @@
 #include <HTTPClient.h>
 #include <config.h>
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für andere Displays oder // Adressen anzupassen
+LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für 2 Zeilen Displays
+//LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
 
 const int DISPLAY_WIDTH = 16; // Definition fürs Display
+//const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
 byte mac[6];   // byte-array für Mac-Adresse
 String payload; // Variable für Nachricht
 String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
