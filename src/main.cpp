@@ -10,6 +10,7 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für andere Displays oder
 const int DISPLAY_WIDTH = 16; // Definition fürs Display
 String payload; // Variable für Nachricht
 String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
+String MacAddr;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
@@ -68,8 +69,8 @@ void setup()
   lcd.setCursor(0, 1);
   lcd.print(OV);
 //WiFi-Parameter setzen und verbinden
- if (!WiFi.config(ip, gateway, subnet, primaryDNS, secondaryDNS)) {
-  Serial.println("STA Failed to configure");
+// if (!WiFi.config(ip, gateway, subnet, primaryDNS, secondaryDNS)) {
+// Serial.println("STA Failed to configure");
 }
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("Connecting to WiFi");
@@ -81,7 +82,21 @@ void setup()
   Serial.println("");
   Serial.print("Connected to WiFi network with IP Address: ");
   Serial.println(WiFi.localIP());
-
+  WiFi.macAddress(mac);
+  MacAddr += String(mac[5],HEX);
+  MacAddr += String(mac[4],HEX);
+  MacAddr += String(mac[3],HEX);
+  MacAddr += String(mac[2],HEX);
+  MacAddr += String(mac[1],HEX);
+  MacAddr += String(mac[0],HEX);
+  Serial.Println("MAC: "+MacAddr);
+  lcd.setCursor(0, 0);
+  lcd.print(Rufzeichen);
+  lcd.setCursor(10, 0);
+  lcd.print(Locator);
+  lcd.setCursor(0, 1);
+  lcd.print("Mac: "+MacAddr);
+  delay(2000);
 }
 
 void loop()
