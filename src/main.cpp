@@ -115,7 +115,7 @@ void loop()
     // Free resources
     http.end();
     fetchmessage = false; // Pause für den Abruf
-    startTime = 0; // Startzeit für Abruf zurücksetzen
+    startTime = millis(); // Startzeit für Abruf neusetzten auf aktuellen Stand
     } 
   if (payload != old_payload)  //bei neuer Nachricht auf dem Server
      {
