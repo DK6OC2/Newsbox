@@ -53,7 +53,7 @@ void setup()
   lcd.setCursor(10, 0);
   lcd.print(Locator);
   lcd.setCursor(0, 1);
-  lcd.print("Mac: "+MacAddr);
+  lcd.print("Mac:"+MacAddr);
   delay(3000);
 }
 
