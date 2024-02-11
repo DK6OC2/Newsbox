@@ -7,7 +7,6 @@
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für andere Displays oder // Adressen anzupassen
 
-int MESSAGE_LENGTH = 100;     // Länge der Nachricht
 const int DISPLAY_WIDTH = 16; // Definition fürs Display
 String payload; // Variable für Nachricht
 String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
@@ -15,7 +14,7 @@ int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 //SSL-Zertifikat
-const char* rootCACertificate = \
+//const char* rootCACertificate = \
      "-----BEGIN CERTIFICATE-----\n" \
      "MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw\n" \
      "TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh\n" \
@@ -87,7 +86,9 @@ void setup()
 
 void loop()
 {
-  client->setCACert(rootCACertificate) ; // Set Server-Certificate
+  //client->setCACert(rootCACertificate); // Set Server-Certificate
+  client->setInsecure(); // ignoriere SSL-Cert
+  
   HTTPClient http ; //Webclient starten
   //Nachricht holen, wenn erster Durchlauf oder Intervall abgelaufen ist
   if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
@@ -120,6 +121,7 @@ void loop()
   if (payload != old_payload)  //bei neuer Nachricht auf dem Server
      {
      payload = payload.substring(0, (payload_length -1)); //entferne endzeichen
+     lcd.clear();  // Display löschen für neue Nachrichte 
       // Nachricht generieren, aufteilen und anzeigen
       if (payload_length > 16) //Wenn zweizeilige Nachricht
         {
@@ -138,8 +140,6 @@ void loop()
         //schreibe einzeilige Nachricht aufs display
         lcd.setCursor(0, 0);
         lcd.print(payload);
-        lcd.setCursor(0, 1);
-        lcd.print("                "); //lösche mögliche Rückstände in Zeile 2
         }
       old_payload = payload ; //Sichere alte Nachricht zum Vergleich
      } 
