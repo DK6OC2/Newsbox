@@ -97,7 +97,7 @@ void loop()
      payload = payload.substring(0, (payload_length -1)); //entferne endzeichen
      lcd.clear();  // Display löschen für neue Nachrichte 
       // Nachricht generieren, aufteilen und anzeigen
-      if (payload_length > 16) //Wenn zweizeilige Nachricht
+      if (payload_length > 16) //Wenn zweizeilige Nachricht, die Anfrage ist unnötig. Wenn die Nachricht kürzer als 16 bzw. 20 Zeichen ist, bleiben die weiteren Zeilen automatisch leer.
         {
         int Trennen = payload.indexOf(";");
         String MESSAGE1 = payload.substring(0, (Trennen)); //Trenne am Semicolon
