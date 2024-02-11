@@ -5,11 +5,11 @@
 #include <HTTPClient.h>
 #include <config.h>
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für 2 Zeilen Displays
-//LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
+//LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für 2 Zeilen Displays
+LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
 
-const int DISPLAY_WIDTH = 16; // Definition fürs Display
-//const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
+//const int DISPLAY_WIDTH = 16; // Definition fürs Display
+const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
 byte mac[6];   // byte-array für Mac-Adresse
 String payload; // Variable für Nachricht
 String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
@@ -102,12 +102,26 @@ void loop()
         int Trennen = payload.indexOf(";");
         String MESSAGE1 = payload.substring(0, (Trennen)); //Trenne am Semicolon
         int temp_var = payload.indexOf(";");
-        String MESSAGE2 = payload.substring(temp_var + 1);
+        String MESSAGE_TEMP = payload.substring(temp_var + 1);
+        Trennen = MESSAGE_TEMP.indexOf(";");
+        String MESSAGE2 = MESSAGE_TEMP.substring(0, (Trennen)); //Trenne wieder Semicolon
+        temp_var = MESSAGE_TEMP.indexOf(";");
+        String MESSAGE_TEMP2 = MESSAGE_TEMP.substring(temp_var + 1);
+        Trennen = MESSAGE_TEMP2.indexOf(";");
+        String MESSAGE3 = MESSAGE_TEMP2.substring(0, (Trennen)); //Trenne wieder Semicolon
+        temp_var = MESSAGE_TEMP2.indexOf(";");
+        String MESSAGE4 = MESSAGE_TEMP2.substring(temp_var + 1);
+
+
         //Schreibe Nachricht aufs Display wenn 2-zeilig
         lcd.setCursor(0, 0);
         lcd.print(MESSAGE1);
         lcd.setCursor(0, 1);
         lcd.print(MESSAGE2);
+        lcd.setCursor(0, 2);
+        lcd.print(MESSAGE3);
+        lcd.setCursor(0, 3);
+        lcd.print(MESSAGE4);
         }
       else // wenn Nachricht kürzer als 16 Zeichen
         {
