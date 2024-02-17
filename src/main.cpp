@@ -4,6 +4,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <HTTPClient.h>
 #include <config.h>
+#include <ArduinoJson.h>
 
 //LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für 2 Zeilen Displays
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
@@ -11,15 +12,27 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
 //const int DISPLAY_WIDTH = 16; // Definition fürs Display
 const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
 byte mac[6];   // byte-array für Mac-Adresse
-String payload; // Variable für Nachricht
-String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
+String JSonMessage;
+JsonDocument doc; //JSON Opject
+//Variablen für Nachricht
+long news_id;
+const char* news_datum;
+const char* news_topic;
+const char* news_zeile1;
+const char* news_zeile2;
+const char* news_zeile3;
+long old_id; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
 String MacAddr;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
-
+int LED_PIN = 2; //Anschluss für LED
+int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
+int B_lastState = LOW;  // the previous state from the input pin
+int B_currentState;     // the current reading from the input pin
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
 WiFiClientSecure *client = new WiFiClientSecure ; // initialisieren des WifiClients mit SSL
+
 
 // LCD initialisieren und Starttexte anzeigen
 void setup()
@@ -57,6 +70,9 @@ void setup()
   lcd.setCursor(0, 1);
   lcd.print("Mac:"+MacAddr);
   delay(3000);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  digitalWrite(LED_PIN, LOW);
 }
 
 void loop()
@@ -68,18 +84,29 @@ void loop()
   if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
     {
     Serial.println("Fetching ... "+URL);
-    http.begin(*client, URL); //Verbindung zum Server aufbauen
+    http.begin(*client, URL+"?mac="+MacAddr); //Verbindung zum Server aufbauen
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     // Send HTTP GET request
     int httpResponseCode = http.GET();
 
     if (httpResponseCode > 0)
     {
-      payload = http.getString(); // Abruf Textdatei
-      Serial.println(payload); // Print response
-      payload_length = payload.length(); //Nachrichtenlänge bestimmen
-      Serial.println("Laenge: ");
-      Serial.println(payload_length);
+      JSonMessage = http.getString(); // Abruf JsonObject
+      DeserializationError err = deserializeJson(doc, JSonMessage); //Parse message   
+      if (err) 
+      {
+           Serial.print(F("deserializeJson() failed with code "));
+           Serial.println(err.f_str());
+      }
+      else
+      {
+        news_id = doc["ID"];
+        news_datum = doc["Datum"];
+        news_topic = doc["Message"]["Topic"];
+        news_zeile1 = doc["Message"]["Zeile1"];
+        news_zeile2 = doc["Message"]["Zeile2"];
+        news_zeile3 = doc["Message"]["Zeile3"];
+      }
     } 
     else 
     {
@@ -92,45 +119,28 @@ void loop()
     fetchmessage = false; // Pause für den Abruf
     startTime = millis(); // Startzeit für Abruf neusetzten auf aktuellen Stand
     } 
-  if (payload != old_payload)  //bei neuer Nachricht auf dem Server
+  if (news_id != old_id)  //bei neuer Nachricht auf dem Server
      {
-     payload = payload.substring(0, (payload_length -1)); //entferne endzeichen
-     lcd.clear();  // Display löschen für neue Nachrichte 
-      // Nachricht generieren, aufteilen und anzeigen
-      if (payload_length > 16) //Wenn zweizeilige Nachricht, die Anfrage ist unnötig. Wenn die Nachricht kürzer als 16 bzw. 20 Zeichen ist, bleiben die weiteren Zeilen automatisch leer.
-        {
-        int Trennen = payload.indexOf(";");
-        String MESSAGE1 = payload.substring(0, (Trennen)); //Trenne am Semicolon
-        int temp_var = payload.indexOf(";");
-        String MESSAGE_TEMP = payload.substring(temp_var + 1);
-        Trennen = MESSAGE_TEMP.indexOf(";");
-        String MESSAGE2 = MESSAGE_TEMP.substring(0, (Trennen)); //Trenne wieder Semicolon
-        temp_var = MESSAGE_TEMP.indexOf(";");
-        String MESSAGE_TEMP2 = MESSAGE_TEMP.substring(temp_var + 1);
-        Trennen = MESSAGE_TEMP2.indexOf(";");
-        String MESSAGE3 = MESSAGE_TEMP2.substring(0, (Trennen)); //Trenne wieder Semicolon
-        temp_var = MESSAGE_TEMP2.indexOf(";");
-        String MESSAGE4 = MESSAGE_TEMP2.substring(temp_var + 1);
-
-
-        //Schreibe Nachricht aufs Display wenn 2-zeilig
-        lcd.setCursor(0, 0);
-        lcd.print(MESSAGE1);
-        lcd.setCursor(0, 1);
-        lcd.print(MESSAGE2);
-        lcd.setCursor(0, 2);
-        lcd.print(MESSAGE3);
-        lcd.setCursor(0, 3);
-        lcd.print(MESSAGE4);
-        }
-      else // wenn Nachricht kürzer als 16 Zeichen
-        {
-        //schreibe einzeilige Nachricht aufs display
-        lcd.setCursor(0, 0);
-        lcd.print(payload);
-        }
-      old_payload = payload ; //Sichere alte Nachricht zum Vergleich
-     } 
+      lcd.clear();  // Display löschen für neue Nachrichte 
+      //Schreibe Nachricht aufs Display wenn 2-zeilig
+      lcd.setCursor(0, 0);
+      lcd.print(news_topic);
+      lcd.setCursor(10, 0);
+      lcd.print(news_datum);
+      lcd.setCursor(0, 1);
+      lcd.print(news_zeile1);
+      lcd.setCursor(0, 2);
+      lcd.print(news_zeile2);
+      lcd.setCursor(0, 3);
+      lcd.print(news_zeile3);
+      old_id = news_id; //Sichere alte Nachricht zum Vergleich
+      digitalWrite(LED_PIN, HIGH); // Schalte LED ein
+     }
+    B_currentState = digitalRead(BUTTON_PIN);
+    if (B_lastState == HIGH && B_currentState == LOW)
+    digitalWrite(LED_PIN, LOW); //Schalte LED aus wenn Taste gedrückt
+    // save the the last state of the button
+    B_lastState = B_currentState;  
     if (millis() - startTime >= interval)
       {
         fetchmessage = true; //wenn Interval um, hole neue Nachricht vom Server in der nächsten loop
