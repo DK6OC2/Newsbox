@@ -84,7 +84,7 @@ void loop()
   if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
     {
     Serial.println("Fetching ... "+URL);
-    http.begin(*client, URL+"?mac="+MacAddr); //Verbindung zum Server aufbauen
+    http.begin(*client, URL+"?mac="+MacAddr+"&call="+Rufzeichen); //Verbindung zum Server aufbauen
     http.addHeader("Content-Type", "application/x-www-form-urlencoded");
     // Send HTTP GET request
     int httpResponseCode = http.GET();
