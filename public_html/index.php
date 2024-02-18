@@ -13,15 +13,18 @@
 	}
 
     // check if we are running for the first time
+	//print_r($settings);
 	$is_setup = (isset($settings) && !empty($settings['do_setup']) && $settings['do_setup'] == 1) ? true : false;
 	if($is_setup && path(0) !== 'settings') {
 		// first time setup
-		header('Location: '.$config['url_detected'].'/index.php?task=setup');
+		header('Location: '.$config['url_detected'].'/settings');
+		echo $config['url_detected'];
+		echo path(1);
 		die();
 	}
 
-
-	switch($task) {
+	$page = mb_strtolower(path(0));
+	switch($page) {
 		case 'login':
 			$template = 'login';
 			require_once(ROOT.DS.'templates'.DS.'loginform.inc.php');
@@ -98,13 +101,13 @@
 			break;
 		default:
 			// redirect everything else to the homepage
-			if(!empty(path(0)) && path(0) != 'task') {
+			if(!empty(path(0)) && path(0) != 'settings') {
 				// die(path(0) . path(1) . 'WTF');
 				header('Location: '.$config['url']);
 				die();
 			}
 
-			// show the homepage
-			require_once(ROOT.DS.'templates'.DS.'timeline.inc.php');
+			// return the JSON for the client
+		
 			break;
 	}
