@@ -28,6 +28,7 @@ unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 int LED_PIN = 2; //Anschluss für LED
 int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
+int buzzer_pin = 5; //Anschluss für Buzzer
 int B_lastState = LOW;  // the previous state from the input pin
 int B_currentState;     // the current reading from the input pin
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
@@ -72,6 +73,7 @@ void setup()
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(buzzer_pin, OUTPUT);
   digitalWrite(LED_PIN, LOW);
 }
 
@@ -135,6 +137,7 @@ void loop()
       lcd.print(news_zeile3);
       old_id = news_id; //Sichere alte Nachricht zum Vergleich
       digitalWrite(LED_PIN, HIGH); // Schalte LED ein
+      tone(buzzer_pin, 1000, 1000);
      }
     B_currentState = digitalRead(BUTTON_PIN);
     if (B_lastState == HIGH && B_currentState == LOW)
