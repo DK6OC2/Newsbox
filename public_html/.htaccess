@@ -1,0 +1,27 @@
+
+AddCharset UTF-8 .json
+AddType application/json .json
+
+<Files ~ "\.db$">
+  <IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+  </IfModule>
+  <IfModule mod_authz_core.c>
+    Require all denied
+  </IfModule>
+</Files>
+
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  
+  # friendly URLs
+  RewriteRule ^feed/json/?$ feed/feed.json [L]
+    
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^(.*) index.php [L]
+</IfModule>
+  
