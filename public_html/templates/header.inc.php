@@ -27,8 +27,7 @@
         integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous">
     </script>
 
-    <link rel="icon" href="<?= $config['url'] ?>/favicon.ico" >
-    <link rel="stylesheet" href="<?= $config['url'] ?>/css/microblog.css" >
+    <link rel="stylesheet" href="<?= $config['url_detected'] ?>/css/microblog.css" >
     <link rel="stylesheet" href="http://newsbox.local/css/microblog.css" >
 
 </head>

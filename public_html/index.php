@@ -25,6 +25,9 @@
 
 	$page = mb_strtolower(path(0));
 	switch($page) {
+		case 'message':
+			require_once(ROOT.DS.'displaymessage.php');
+			break;
 		case 'login':
 			$template = 'login';
 			require_once(ROOT.DS.'templates'.DS.'loginform.inc.php');
@@ -54,7 +57,7 @@
 
 				if(!empty(path(1))) {
 					// get magic link
-					list('settings_value' => $bytes, 'settings_updated' => $age) = db_get_setting('magic_url', true);
+					list('settings_value' => $bytes, 'settings_updated' => $age) = get_setting('magic_url', true);
 					if(empty($bytes)) exit('Invalid URL');
 
 					// validate
@@ -106,8 +109,6 @@
 				header('Location: '.$config['url']);
 				die();
 			}
-
-			// return the JSON for the client
-		
+			echo "This is the NewsBox System";		
 			break;
 	}

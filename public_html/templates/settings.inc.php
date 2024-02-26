@@ -75,7 +75,7 @@
                 <?php endif; ?>
 
                 <form action="" method="post" enctype="multipart/form-data" id="post-settings-form"
-                    data-redirect="<?= $config['url'] ?>/settings">
+                    data-redirect="<?= $config['url_detected'] ?>/settings">
                     <?php if($is_setup): ?><input name="s[do_setup]" type="hidden" value="0"><?php endif; ?>
 
                     <div class="mb-3">
@@ -91,7 +91,7 @@
 					<div class="mb-3">
                         <label for="s-newsboxname" class="form-label">Name of your newsbox</label>
                         <input id="s-newsboxname" name="s[newsbox_name]" type="text" class="form-control"
-                            value="<?= $settings['admin_user'] ?? '' ?>" placeholder="Set a name for your newsbox">
+                            value="<?= $settings['admin_user'] ?? '' ?>" placeholder="Set a name for your newsbox group.">
                     </div>
                     <div class="mb-3">
                         <label for="s-admin-user" class="form-label">Login username</label>
@@ -101,7 +101,7 @@
                     <div class="mb-3">
                         <label for="s-admin-pass" class="form-label">Login password</label>
                         <input id="s-admin-pass" name="s[admin_pass]" type="text" class="form-control"
-                            value="<?= $is_setup ? $settings['admin_pass'] : '' ?>" placeholder="Set a login password">
+                            value="<?= $is_setup ? '' : $settings['admin_pass'] ?>" placeholder="Set a login password">
                     </div>
                     <div class="mb-3">
                         <label for="s-admin-email" class="form-label">Recovery Email</label>

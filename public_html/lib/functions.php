@@ -19,6 +19,24 @@ function get_host($preserve_port=false) {
 }
 
 //todo schreib den content in ein array
+
+// BOX REGISTRATION
+function newsbox_register($macaddr) {
+	global $db;
+	if(empty($db)) return false;
+
+	// check if already registered
+	$statement = $db->prepare('SELCT FROM ');
+	statement->bindValue(':macaddr', $macaddr, PDO::PARAM_STR);
+	$statement->execute();
+
+	// if not, register
+	$statement = $db->prepare('INSERT INTO messages() VALUES (:macaddr) ');
+	statement->bindValue(':macaddr', $macaddr, PDO::PARAM_STR);
+	$statement->execute();
+}
+
+// MESSAGES
 function msg_insert($arr_msg, $timestamp=NOW) {
 	global $db;
 	if(empty($db)) return false;
@@ -71,6 +89,7 @@ function msg_select($id=0) {
 
 }
 
+// SETTINGS
 function get_setting($key, $raw=false) {
 	global $db;
 	if(empty($db) || empty($key)) return false;

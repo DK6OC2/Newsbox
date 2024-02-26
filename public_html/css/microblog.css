@@ -52,23 +52,6 @@ nav.main ul {
 	margin-bottom: 2rem;
 }
 
-nav.main li {
-	list-style: none;
-	flex: 1;
-}
-
-nav.main li a {
-	/* inherits from .button */
-}
-
-nav.main li + li a {
-	margin-left: 0.2rem;
-}
-
-.wrap .posts {
-
-}
-
 .wrap .posts > li {
 	list-style: none;
 	margin-bottom: 1rem;
@@ -376,10 +359,6 @@ form.edit,
 	align-items: center;
 }
 
-.login input[type="submit"] {
-	float: none;
-}
-
 .login input[type="text"]:focus,
 .login input[type="password"]:focus {
 	border-color: var(--primary-color);
@@ -433,26 +412,6 @@ form.edit,
 	opacity: 0.4;
 }
 
-footer {
-	width: min(95%, 40rem);
-	margin: 0.5rem auto 2rem;
-}
-
-footer ul {
-	list-style: none;
-	display: flex;
-	justify-content: center;
-	gap: 1rem;
-}
-
-footer li a {
-	color: hsla(0, 0%, 0%, 0.3);
-	text-decoration: none;
-	font-size: 0.8rem;
-	text-transform: uppercase;
-	font-weight: bold;
-	margin-bottom: 0.5rem;
-}
 
 /*
 @supports (background: paint(id)) {
