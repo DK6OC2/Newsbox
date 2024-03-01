@@ -1,16 +1,21 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
 
-//LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für 2 Zeilen Displays
-LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
-
-//const int DISPLAY_WIDTH = 16; // Definition fürs Display
+#ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
+#include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
+#endif
+
+#ifdef DISPLAY_OLED13 // für 1,3" OLEDS
+#endif
+
+#ifdef DISPLAY_OLED096 // für 0,96" OLEDS
+#endif
 byte mac[6];   // byte-array für Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
@@ -43,9 +48,10 @@ void setup()
   Serial.setTimeout(1000); // miliseconds to wait (50 mili) for USB Data. Default 1000
 
   // LCD
-  //lcd.begin(0, 2); //je nach Display ggf. statt init()
+  #ifdef DISPLAY_2004
   lcd.init();
   lcd.backlight();
+  #endif
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
@@ -64,12 +70,14 @@ void setup()
   MacAddr += String(mac[1],HEX);
   MacAddr += String(mac[0],HEX);
   Serial.println("MAC: "+MacAddr);
+  #ifdef DISPLAY_2004
   lcd.setCursor(0, 0);
   lcd.print(Rufzeichen);
   lcd.setCursor(10, 0);
   lcd.print(Locator);
   lcd.setCursor(0, 1);
   lcd.print("Mac:"+MacAddr);
+  #endif
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -123,6 +131,7 @@ void loop()
     } 
   if (news_id != old_id)  //bei neuer Nachricht auf dem Server
      {
+      #ifdef DISPLAY_2004
       lcd.clear();  // Display löschen für neue Nachrichte 
       //Schreibe Nachricht aufs Display wenn 2-zeilig
       lcd.setCursor(0, 0);
@@ -135,9 +144,12 @@ void loop()
       lcd.print(news_zeile2);
       lcd.setCursor(0, 3);
       lcd.print(news_zeile3);
+      #endif
       old_id = news_id; //Sichere alte Nachricht zum Vergleich
       digitalWrite(LED_PIN, HIGH); // Schalte LED ein
+      #ifdef BUZZER_PASSIVE
       tone(buzzer_pin, 1000, 1000);
+      #endif
      }
     B_currentState = digitalRead(BUTTON_PIN);
     if (B_lastState == HIGH && B_currentState == LOW)
