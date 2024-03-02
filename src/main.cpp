@@ -197,6 +197,11 @@ void loop()
       #ifdef BUZZER_PASSIVE
       tone(buzzer_pin, 1000, 1000);
       #endif
+      #ifdef BUZZER_ACTIVE
+      digitalWrite(buzzer_pin, HIGH);
+      delay(1000);
+      digitalWrite(buzzer_pin, LOW);
+      #endif      
      }
     B_currentState = digitalRead(BUTTON_PIN);
     if (B_lastState == HIGH && B_currentState == LOW)
