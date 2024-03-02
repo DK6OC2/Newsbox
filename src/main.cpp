@@ -10,11 +10,13 @@
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
 #endif
-
-#ifdef DISPLAY_OLED13 // für 1,3" OLEDS
+#ifdef DISPLAY_OLED096 // für 1,3" OLEDS
+#include "U8g2lib.h"
+U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 #endif
-
-#ifdef DISPLAY_OLED096 // für 0,96" OLEDS
+#ifdef DISPLAY_OLED13 // für 0,96" OLEDS
+#include "U8g2lib.h"
+U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 #endif
 byte mac[6];   // byte-array für Mac-Adresse
 String JSonMessage;
@@ -52,6 +54,17 @@ void setup()
   lcd.init();
   lcd.backlight();
   #endif
+  #ifdef DISPLAY_OLED096
+  oled.begin();
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_resoledbold_tr);
+  #endif
+  #ifdef DISPLAY_OLED13
+  oled.begin();
+  oled.clearBuffer();
+  oled.setFont(u8g2_font_6x13_tr);
+  #endif
+
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   Serial.println("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
@@ -76,7 +89,21 @@ void setup()
   lcd.setCursor(10, 0);
   lcd.print(Locator);
   lcd.setCursor(0, 1);
-  lcd.print("Mac:"+MacAddr);
+  lcd.print("Mac: "+MacAddr);
+  #endif
+  #ifdef DISPLAY_OLED096
+  oled.drawStr(0,15, Rufzeichen);
+  oled.drawStr(70,15, Locator);
+  oled.drawStr(0,30, "Mac: ");
+  oled.drawStr(25,30, MacAddr.c_str());
+  oled.sendBuffer();
+  #endif
+  #ifdef DISPLAY_OLED13
+  oled.drawStr(2,15, Rufzeichen);
+  oled.drawStr(70,15, Locator);
+  oled.drawStr(2,30, "Mac: ");
+  oled.drawStr(27,30, MacAddr.c_str());
+  oled.sendBuffer();
   #endif
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
@@ -144,6 +171,26 @@ void loop()
       lcd.print(news_zeile2);
       lcd.setCursor(0, 3);
       lcd.print(news_zeile3);
+      #endif
+      #ifdef DISPLAY_OLED096
+      oled.clear();  // Display löschen für neue Nachrichte 
+      //Schreibe Nachricht aufs Display wenn 2-zeilig
+      oled.drawStr(0,15, news_topic);
+      oled.drawStr(60,15, news_datum);
+      oled.drawStr(0,30, news_zeile1);
+      oled.drawStr(0,40, news_zeile2);
+      oled.drawStr(0,50, news_zeile3);
+      oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_OLED13
+      oled.clear();  // Display löschen für neue Nachrichte 
+      //Schreibe Nachricht aufs Display wenn 2-zeilig
+      oled.drawStr(2,15, news_topic);
+      oled.drawStr(65,15, news_datum);
+      oled.drawStr(2,36, news_zeile1);
+      oled.drawStr(2,50, news_zeile2);
+      oled.drawStr(2,64, news_zeile3);
+      oled.sendBuffer();
       #endif
       old_id = news_id; //Sichere alte Nachricht zum Vergleich
       digitalWrite(LED_PIN, HIGH); // Schalte LED ein
