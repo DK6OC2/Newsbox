@@ -25,11 +25,7 @@
 
 	$page = mb_strtolower(path(0));
 	switch($page) {
-		case 'message':
-			require_once(ROOT.DS.'displaymessage.php');
-			break;
 		case 'login':
-			$template = 'login';
 			require_once(ROOT.DS.'templates'.DS.'loginform.inc.php');
 			break;
 		case 'logout':
@@ -40,16 +36,18 @@
 
 			header('Location: '.$config['url']);
 			break;
-		case 'new':
-			$template = 'postform';
+		case 'message':
+			require_once(ROOT.DS.'message.php');
+			break;
+		case 'newmsg':
 			require_once(ROOT.DS.'templates'.DS.'msgform.inc.php');
+			break;
+		case 'listmessages':
+			require_once(ROOT.DS.'templates'.DS.'listmessages.inc.php');
 			break;
 		case 'settings':
 			$template = 'settings';
 			require_once(ROOT.DS.'templates'.DS.'settings.inc.php');
-			break;
-		case 'pk':
-			require_once(ROOT.DS.'lib'.DS.'passkeys.php');
 			break;
 		case 'recovery':
 			// password recovery via email
@@ -80,7 +78,7 @@
 					$bytes = bin2hex(random_bytes(16));
 					$magic_link = $config['url'].'/recovery/'.$bytes;
 
-					db_set_setting('magic_url', $bytes);
+					set_setting('magic_url', $bytes);
 
 					$mailtext  = 'Your recovery link for Microblog:'.NL;
 					$mailtext .= $magic_link.NL;

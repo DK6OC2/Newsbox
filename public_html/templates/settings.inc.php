@@ -110,16 +110,6 @@
                             placeholder="Set an email address for password recovery">
                     </div>
                     <div class="mb-3">
-                        <label for="s-local_timezone" class="form-label">Local Time Zone</label>
-                        <select id="s-local_timezone" name="s[local_timezone]" class="form-control"><?php 
-					$timezones= DateTimeZone::listIdentifiers();
-					foreach ($timezones as $timezone) {
-							$active = (($settings['local_timezone'] ?? '') == $timezone) ? ' selected' : '';
-							echo('<option value="'.$timezone.'"'.$active.'>'.$timezone.'</option>'.NL);
-					}
-					?></select>
-                    </div>
-                    <div class="mb-3">
                         <input class="btn btn-primary" type="submit" name="settings" value="Save">
                     </div>
 
@@ -134,6 +124,8 @@
                                     <dd><?= $config['url_detected'] ?></dd>
                                     <dt><label>Path</label></dt>
                                     <dd><?= realpath(ROOT) ?></dd>
+                                    <dt><label>Timezone</label></dt>
+                                    <dd><?= date_default_timezone_get(); ?></dd>
                                     <dt><label>Timezone offset</label></dt>
                                     <dd><?= $config['local_time_offset'] ?></dd>
                                     <dt><label>Installed on domain root</label></dt>

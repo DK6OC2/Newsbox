@@ -1,5 +1,4 @@
 <?php
-
 function path($fragment=null) {
 	global $config;
 	if($fragment === null) return $config['path'];
@@ -18,75 +17,10 @@ function get_host($preserve_port=false) {
 	}
 }
 
-//todo schreib den content in ein array
+function current_datetime() {
 
-// BOX REGISTRATION
-function newsbox_register($macaddr) {
-	global $db;
-	if(empty($db)) return false;
-
-	// check if already registered
-	$statement = $db->prepare('SELCT FROM ');
-	statement->bindValue(':macaddr', $macaddr, PDO::PARAM_STR);
-	$statement->execute();
-
-	// if not, register
-	$statement = $db->prepare('INSERT INTO messages() VALUES (:macaddr) ');
-	statement->bindValue(':macaddr', $macaddr, PDO::PARAM_STR);
-	$statement->execute();
-}
-
-// MESSAGES
-function msg_insert($arr_msg, $timestamp=NOW) {
-	global $db;
-	if(empty($db)) return false;
-
-	$statement = $db->prepare('INSERT INTO messages (category, 1line, 2line, 3line, 4line, validfrom_timestamp, creation_timestamp ) VALUES (:category, :1line, :2line, :3line, :4line, :validfrom_timestamp, :creation_timestamp)');
-	$statement->bindValue(':category', $arr_msg['category'], PDO::PARAM_STR);
-	$statement->bindValue(':1line', $arr_msg['1line'], PDO::PARAM_INT);
-	$statement->bindValue(':2line', $arr_msg['2line'], PDO::PARAM_STR);
-    $statement->bindValue(':3line', $arr_msg['3line'], PDO::PARAM_STR);
-    $statement->bindValue(':4line', $arr_msg['4line'], PDO::PARAM_STR);
-    $statement->bindValue(':validfrom_timestamp', $arr_msg['validfrom_timestamp'], PDO::PARAM_STR);
-    $statement->bindValue(':creation_timestamp', $timestamp, PDO::PARAM_STR);
-	$statement->execute();
-
-    return $db->lastInsertId();
-}
-
-function msg_update($post_id, $content, $timestamp=null) {
-	global $db;
-	if(empty($db)) return false;
-	if(empty($content)) return false;
-	if(!is_numeric($post_id) || $post_id <= 0) return false;
-
-	if($timestamp !== null) {
-		$statement = $db->prepare('UPDATE messages SET post_content = :post_content, post_edited = :post_edited, post_timestamp = :post_timestamp WHERE id = :id');
-		$statement->bindValue(':post_timestamp', $timestamp, PDO::PARAM_INT);
-	} else {
-		$statement = $db->prepare('UPDATE messages SET post_content = :post_content, post_edited = :post_edited WHERE id = :id');
-	}
-	$statement->bindValue(':id', $post_id, PDO::PARAM_INT);
-	$statement->bindValue(':post_content', $content, PDO::PARAM_STR);
-	$statement->bindValue(':post_edited', time(), PDO::PARAM_INT);
-
-	$statement->execute();
-
-	return $statement->rowCount();
-}
-
-function msg_select($id=0) {
-    global $db;
-	if(empty($db)) return false;
-	if($id === 0) return false;
-
-    $statement = $db->prepare('SELECT * FROM messages WHERE id = :id LIMIT 1');
-	$statement->bindValue(':id', $id, PDO::PARAM_INT);
-	$statement->execute();
-	$row = $statement->fetch(PDO::FETCH_ASSOC);
-
-	return (!empty($row)) ? $row : false;
-
+	$value = date('Y-m-d\TH:i:sp');
+	return $value;
 }
 
 // SETTINGS
@@ -108,7 +42,6 @@ function get_setting($key, $raw=false) {
 	}
 	return false;
 }
-
 function set_setting($key, $value) {
 	global $db;
 	if(empty($db) || empty($key)) return false;
@@ -128,3 +61,138 @@ function set_setting($key, $value) {
 
 	return true;
 }
+
+
+function generate_random_string($length = 5) {
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+    for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[random_int(0, $charactersLength - 1)];
+    }
+    return $randomString;
+}
+
+// CLIENT 
+/* Database columns:
+	macaddr
+    callsign                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               
+    ov
+	lastseen 
+	created_at
+*/
+function client_check($mac_addr) {
+	global $db;
+	if(empty($db)) return false;
+
+	// check if already registered
+	$statement = $db->prepare('SELECT COUNT(macaddr) FROM clients WHERE macaddr = :macaddr');
+	$statement->bindValue(':macaddr', strtolower($mac_addr), PDO::PARAM_STR);
+	$statement->execute() or die(print_r($db->errorInfo(), true));
+
+	//return $statement->rowCount();
+	return $statement->fetchColumn();
+
+}
+function client_register($mac_addr) {
+	global $db;
+	if(empty($db)) return false;
+
+	// if not, register
+	if (TRUE) {
+		$statement = $db->prepare('INSERT INTO clients(macaddr,passkey, lastseen,created_at) VALUES (:mac_addr, :passkey, :lastseen,:created_at)');
+		$statement->bindValue(':mac_addr', strtolower($mac_addr), PDO::PARAM_STR);
+		$statement->bindValue(':passkey', generate_random_string(), PDO::PARAM_STR);
+		$statement->bindValue(':lastseen', NOW, PDO::PARAM_STR);
+		$statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
+		$statement->execute();
+	}
+	return $statement->rowCount();
+}
+function client_update_lastseen($mac_addr) {
+	global $db;
+	if(empty($db)) return false;
+	if (TRUE) {
+		$statement = $db->prepare('UPDATE clients SET lastseen = '.NOW.' WHERE macaddr = ');
+		$statement->bindValue(':macaddr', strtolower($mac_addr), PDO::PARAM_STR);
+		
+		$statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
+		$statement->execute();
+	}
+	return $statement->rowCount();
+}
+
+function client_update_values($arr_content, $mac_addr ) {
+	global $db;
+	if(empty($db)) return false;
+	if (TRUE) {
+		$statement = $db->prepare('UPDATE clients SET callsign = :callsign, ov = :ov WHERE macaddr = :macaddr');
+		$statement->bindValue(':macaddr', strtolower($mac_addr), PDO::PARAM_STR);
+		$statement->bindValue(':callsign', strtoupper($arr_content), PDO::PARAM_STR);
+		$statement->bindValue(':ov', strtoupper($arr_content), PDO::PARAM_STR);
+		$statement->execute();
+	}
+	return $statement->rowCount();
+}
+
+function client_get_passkey($mac_addr){
+	global $db;
+	if(empty($db)) return false;
+	if (TRUE) {
+		$statement = $db->prepare('SELECT passkey FROM clients WHERE macaddr = :macaddr');
+		$statement->bindValue(':macaddr', strtolower($mac_addr), PDO::PARAM_STR);
+		$statement->execute();
+	}
+	return $statement->fetch();
+}
+
+// MESSAGES
+function msg_insert($arr_post, $timestamp=NOW) {
+	global $db;
+	if(empty($db)) return false;
+
+	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) VALUES (:category, :1line, :2line, :3line, :4line, :validfrom_timestamp, :creation_timestamp)');
+	$statement->bindValue(':line1', $arr_post['line1'], PDO::PARAM_INT);
+	$statement->bindValue(':line2', $arr_post['line2'], PDO::PARAM_STR);
+    $statement->bindValue(':line3', $arr_post['line3'], PDO::PARAM_STR);
+    $statement->bindValue(':validfrom', $arr_post['validfrom'], PDO::PARAM_STR);
+    $statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
+	$statement->execute();
+
+    return $db->lastInsertId();
+}
+function msg_update($post_id, $arr_post, $timestamp=null) {
+	global $db;
+	if(empty($db)) return false;
+	if(empty($content)) return false;
+	if(!is_numeric($post_id) || $post_id <= 0) return false;
+
+	if($timestamp !== null) {
+		$statement = $db->prepare('UPDATE messages SET line1 = :line1, line2 = :line2, line3 = :line3,	modified_at = :modified_at WHERE id = :id');
+		$statement->bindValue(':post_timestamp', $timestamp, PDO::PARAM_INT);
+	} else {
+		$statement = $db->prepare('UPDATE messages SET post_content = :post_content, post_edited = :post_edited WHERE id = :id');
+	}
+	$statement->bindValue(':id', $post_id, PDO::PARAM_INT);
+	$statement->bindValue(':topic', $arr_post['topic'], PDO::PARAM_STR);
+	$statement->bindValue(':line1', $arr_post['line1'], PDO::PARAM_STR);
+	$statement->bindValue(':line2', $arr_post['line2'], PDO::PARAM_STR);
+	$statement->bindValue(':line3', $arr_post['line3'], PDO::PARAM_STR);
+	$statement->bindValue(':modified_at', time(), PDO::PARAM_STR);
+
+	$statement->execute();
+
+	return $statement->rowCount();
+}
+function msg_select_latest() {
+    global $db;
+	if(empty($db)) return false;
+
+    $statement = $db->prepare('SELECT * FROM messages ORDER BY created_at DESC LIMIT 1');
+	$statement->execute();
+	$row = $statement->fetch(PDO::FETCH_ASSOC);
+
+	return (!empty($row)) ? $row : false;
+
+}
+

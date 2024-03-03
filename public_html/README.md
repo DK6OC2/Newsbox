@@ -48,8 +48,24 @@ Da die Nachrichten in der Datenbank gespeichert werden, ist es leicht möglich, 
 ## robots.txt
 Diese Datei wird von Suchmaschinen ausgelesen. In unserem Projekt soll verhindert werden, dass eine Suchmaschine unsere URLs in deren Verzeichnis aufnimmt. 
 
+# Description of definitions
+
+## NOW 
+Is the current date and time in ISO8601 format
+
+
 # Description of variables
 
-## $config
+## $characters
+Hier werden die Zeichen hinterlegt, die für den PassKey genutzt werden. 
+Der PassKey wird dem Client initial angezeigt, damit er seine Box konfigurieren kann.
 
-## $settings
+## $uri
+
+## $path
+
+
+## array $config
+
+## array $settings
+

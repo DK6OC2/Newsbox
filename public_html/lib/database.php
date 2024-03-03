@@ -27,17 +27,20 @@ if($db_version == 0) {
 				`description` TEXT,
 				`created_at` TEXT
 				);
-			INSERT INTO `topics` (name, description, created_at) VALUES ('test', 'This is a Test topic only.', '".NOW."');
+			INSERT INTO `topics` (name, description, created_at) VALUES ('test', 'This is a Test topic.', '".NOW."');
+			INSERT INTO `topics` (name, description, created_at) VALUES ('default', 'This is a default topic.', '".NOW."');
 
 			CREATE TABLE IF NOT EXISTS `messages` (
 			`id` INTEGER PRIMARY KEY NOT NULL,
-            `secondline` TEXT,
-            `thirdline` TEXT,
-            `fourthline` TEXT,
+            `line1` TEXT,
+            `line2` TEXT,
+            `line3` TEXT,
 			`validfrom` TEXT,
+			`modified_at` TEXT,
 			`created_at` TEXT
 		    );
-			INSERT INTO `messages` (secondline, thirdline, fourthline, validfrom, created_at) VALUES ('2.Zeile', '3.Zeile', '4.Zeile','".NOW."', '".NOW."');
+			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '2. Zeile', '3. Zeile','".NOW."', '".NOW."');
+			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '2. Zeile', '3. Zeile','".NOW."', '".NOW."');
 
 			CREATE TABLE IF NOT EXISTS `map_messages_topics` (
 				`id` INTEGER PRIMARY KEY NOT NULL,
@@ -46,16 +49,19 @@ if($db_version == 0) {
 				`created_at` TEXT
 		    );
 			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (1,1,'".NOW."');
+			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (2,2,'".NOW."');
 
             CREATE TABLE IF NOT EXISTS `clients` (
                 `id` INTEGER PRIMARY KEY NOT NULL,
                 `macaddr` TEXT UNIQUE,
                 `callsign` TEXT,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
                 `ov` TEXT,
+				`passkey` TEXT,
 				`lastseen` TEXT,
 				`created_at` TEXT
 			);
             CREATE UNIQUE INDEX `macaddr` ON clients (`macaddr`);
+			CREATE UNIQUE INDEX `passkey` ON clients (`passkey`);
 
 			CREATE TABLE IF NOT EXISTS `map_clients_topics` (
 				`id` INTEGER PRIMARY KEY NOT NULL,

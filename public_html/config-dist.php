@@ -1,18 +1,20 @@
 <?php
+
+//PHP settings
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
-
-DEFINE('ROOT', __DIR__);
-DEFINE('DS', DIRECTORY_SEPARATOR);
-DEFINE('NL', "\n");
-DEFINE('BR', "<br />");
-DEFINE('NOW', date("c")); // ISO8601 Format
-
 date_default_timezone_set('Europe/Berlin');
 
-// set up database connection
-require_once(ROOT.DS.'lib'.DS.'database.php');
+// Definitions
+DEFINE('ROOT', __DIR__);
+DEFINE('DS', DIRECTORY_SEPARATOR);
+DEFINE('NOW', date("c")); // ISO8601 Format
 
+/* characters for PassKey */
+$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+// set up database
+require_once(ROOT.DS.'lib'.DS.'database.php');
 
 /* make the path easier to read */
 $dir = dirname($_SERVER['SCRIPT_NAME']);
@@ -22,7 +24,7 @@ $path_fragments = parse_url($uri, PHP_URL_PATH);
 $path = (empty($path_fragments)) ? [''] : explode('/', trim($path_fragments, '/'));
 if(mb_strlen($path[0]) == 0) { $path = []; }
 
-// load settings
+/* load settings */
 $statement = $db->prepare('SELECT * FROM settings');
 $statement->execute();
 $settings_raw = $statement->fetchAll(PDO::FETCH_ASSOC);
@@ -62,6 +64,15 @@ $config['subdir_install'] = ($dir === '/') ? false : true;
 $config['local_time_offset'] = date('P');
 
 unset($dir, $uri, $path_fragments, $path);
+
+// not registered message 
+$msg_not_registered = array(
+	'Topic'	 => 'Anmeldung',
+	'Zeile1' => 'Box ist unbekannt',
+	'Zeile2' => 'Registrierung ',
+	'Zeile3' => 'Dein PassKey: 12345'
+);
+
 
 // load functions
 require_once(ROOT.DS.'lib'.DS.'functions.php');
