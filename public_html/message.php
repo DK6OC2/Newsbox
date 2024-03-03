@@ -13,7 +13,18 @@ function send_msg($arr_msg){
 // set variable
 $mac_addr = path(1);
 
-// chech if mac is present
+// check if mac is missing
+if (empty($mac_addr)) {
+    $msg = array(
+        'Topic'	 => 'E409',
+        'Zeile1' => ' - E R R O R - ',
+        'Zeile2' => ' Missing Addr ',
+    );
+    send_msg($msg);
+    exit;
+}
+
+// check if max is 12 char
 if (strlen($mac_addr) !== 12 ){
     $msg = array(
         'Topic'	 => 'E409',
@@ -25,14 +36,15 @@ if (strlen($mac_addr) !== 12 ){
     exit;
 }
 
-// check if mac is known
+// check if mac is registered
 if ( client_check($mac_addr) == 1 ) {
     $clientStatus = "known";
-    
     send_msg(msg_select_latest());
 
 } else {
     $clientStatus = "unknown";
-    send_msg($msg_not_registered);
-    client_register($mac_addr);
+   
+    $replacements = array('Zeile3'=> 'Dein PassKey:' . client_get_passkey($mac_addr)['passkey'] );
+    $msg = array_replace($msg_not_registered,$replacements);
+    send_msg($msg);
 }

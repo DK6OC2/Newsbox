@@ -39,11 +39,11 @@
 		case 'message':
 			require_once(ROOT.DS.'message.php');
 			break;
-		case 'newmsg':
-			require_once(ROOT.DS.'templates'.DS.'msgform.inc.php');
+		case 'msgnew':
+			require_once(ROOT.DS.'templates'.DS.'msgnew.inc.php');
 			break;
-		case 'listmessages':
-			require_once(ROOT.DS.'templates'.DS.'listmessages.inc.php');
+		case 'msglist':
+			require_once(ROOT.DS.'templates'.DS.'msglist.inc.php');
 			break;
 		case 'settings':
 			$template = 'settings';

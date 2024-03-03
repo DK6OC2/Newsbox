@@ -88,10 +88,11 @@
                             value="<?= $is_setup ? $config['url_detected'] : ($settings['url'] ?? '') ?>"
                             placeholder="The URL of your newsbox">
                     </div>
-					<div class="mb-3">
+                    <div class="mb-3">
                         <label for="s-newsboxname" class="form-label">Name of your newsbox</label>
                         <input id="s-newsboxname" name="s[newsbox_name]" type="text" class="form-control"
-                            value="<?= $settings['admin_user'] ?? '' ?>" placeholder="Set a name for your newsbox group.">
+                            value="<?= $settings['site_title'] ?? '' ?>"
+                            placeholder="Set a name for your newsbox group.">
                     </div>
                     <div class="mb-3">
                         <label for="s-admin-user" class="form-label">Login username</label>
@@ -130,13 +131,16 @@
                                     <dd><?= $config['local_time_offset'] ?></dd>
                                     <dt><label>Installed on domain root</label></dt>
                                     <dd><?= $config['subdir_install'] != 1 ? 'Yes' : 'No' ?></dd>
-									
-									<dt><label>Is SQLite supported ?</label></dt>
-									<?php if (class_exists('SQLite3')) { echo 'Yes, SQLite3 extension loaded.'; } else { echo '- NO,it is not - Now, please install SQLite3.';} ?>
+
+                                    <dt><label>Is SQLite supported ?</label></dt>
+                                    <?php if (class_exists('SQLite3')) { echo 'Yes, SQLite3 extension loaded.'; } else { echo '- NO,it is not - Now, please install SQLite3.';} ?>
+                                    <dt><label>Settings</label></dt>
+                                    <dd><pre><?php print_r($settings); ?></pre></dd>
                                 </dl>
                             </fieldset>
-							<p>&nbsp;</p>
-							<br>
+
+                            <p>&nbsp;</p>
+                            <br>
                         </div>
                     </div>
                 </form>

@@ -107,7 +107,9 @@ function client_register($mac_addr) {
 		$statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
 		$statement->execute();
 	}
-	return $statement->rowCount();
+	//return $statement->rowCount();
+	return $statement->fetchAll();
+
 }
 function client_update_lastseen($mac_addr) {
 	global $db;
@@ -188,7 +190,7 @@ function msg_select_latest() {
     global $db;
 	if(empty($db)) return false;
 
-    $statement = $db->prepare('SELECT * FROM messages ORDER BY created_at DESC LIMIT 1');
+    $statement = $db->prepare('SELECT line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
 	$statement->execute();
 	$row = $statement->fetch(PDO::FETCH_ASSOC);
 
