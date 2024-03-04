@@ -17,7 +17,7 @@
             'line2' => $_POST['line2'],
             'line3' => $_POST['line3']
         );
-        $id = msg_insert($arr_content, NOW);
+        $id = msg_insert($arr_content, NOW_ISO);
         echo $id;
 
     } else {

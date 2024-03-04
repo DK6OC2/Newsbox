@@ -3,13 +3,15 @@
     // create config file
 	$config_file = __DIR__.DIRECTORY_SEPARATOR.'config.php';
 	$config_file_default = __DIR__.DIRECTORY_SEPARATOR.'config-dist.php';
-	if(!include_once($config_file)) {
-		if(file_exists($config_file_default)) {
+	if (!file_exists($config_file)) { 
+		if (file_exists($config_file_default)) {
 			copy($config_file_default, $config_file);
 			chmod($config_file, 0644);
 			header('Refresh:1');
 			exit();
 		}
+	} else {
+		include_once($config_file);
 	}
 
     // check if we are running for the first time
@@ -23,6 +25,8 @@
 		die();
 	}
 
+	$config['logged_in'] = check_login();
+
 	$page = mb_strtolower(path(0));
 	switch($page) {
 		case 'login':
@@ -31,8 +35,8 @@
 		case 'logout':
 			$host = get_host(false); // cookies are port-agnostic
 			$domain = ($host != 'localhost') ? $host : false;
-			setcookie('microblog_login', '', time()-3600, '/', $domain, false);
-			unset($_COOKIE['microblog_login']);
+			setcookie('newsbox', '', time()-3600, '/', $domain, false);
+			unset($_COOKIE['newsbox']);
 
 			header('Location: '.$config['url']);
 			break;
@@ -62,7 +66,7 @@
 					if(path(1) === $bytes) {
 
 						// check link age (valid for 1h)
-						if($age > NOW - 3600) {
+						if($age > NOW_UNIX - 3600) {
 							$config['logged_in'] = check_login(true); // force entry!
 
 							header('Location: '.$config['url'].'/settings');

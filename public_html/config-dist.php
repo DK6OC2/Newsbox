@@ -8,13 +8,9 @@ date_default_timezone_set('Europe/Berlin');
 /* Definitions */
 DEFINE('ROOT', __DIR__);
 DEFINE('DS', DIRECTORY_SEPARATOR);
-DEFINE('NOW', date("c")); // ISO8601 Format
-
-/* characters for PassKey */
-$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-/* set up database */
-require_once(ROOT.DS.'lib'.DS.'database.php');
+DEFINE('NL', "\n");
+DEFINE('NOW_ISO', date("c")); // ISO8601 Format
+DEFINE('NOW_UNIX', time()); // Unix timestamp (needed by cookie)
 
 /* make the path easier to read */
 $dir = dirname($_SERVER['SCRIPT_NAME']);
@@ -23,6 +19,11 @@ $uri = substr($uri, mb_strlen($dir)); // handle subdir installs
 $path_fragments = parse_url($uri, PHP_URL_PATH);
 $path = (empty($path_fragments)) ? [''] : explode('/', trim($path_fragments, '/'));
 if(mb_strlen($path[0]) == 0) { $path = []; }
+$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; // characters for PassKey
+$install_signature = bin2hex(random_bytes(16));
+
+/* set up database */
+require_once(ROOT.DS.'lib'.DS.'database.php');
 
 /* load settings_raw */
 $statement = $db->prepare('SELECT * FROM settings');
@@ -67,10 +68,10 @@ unset($dir, $uri, $path_fragments, $path);
 
 /* not registered message */
 $msg_not_registered = array(
-	'Topic'	 => 'Anmeldung',
-	'Zeile1' => 'Box ist unbekannt',
-	'Zeile2' => 'Registrierung ',
-	'Zeile3' => 'Dein PassKey: xxxxx'
+	'Topic'	 => 'Anmeldung',          //max 9char
+	'Zeile1' => 'Registrierung',      //max 20char
+	'Zeile2' => 'erfolgreich',        //max 20char
+	'Zeile3' => 'Dein PassKey: xxxxx' //max 20char
 );
 
 /* load functions */

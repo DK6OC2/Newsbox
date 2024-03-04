@@ -62,7 +62,6 @@ function set_setting($key, $value) {
 	return true;
 }
 
-
 function generate_random_string($length = 5) {
     $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     $charactersLength = strlen($characters);
@@ -71,6 +70,29 @@ function generate_random_string($length = 5) {
         $randomString .= $characters[random_int(0, $charactersLength - 1)];
     }
     return $randomString;
+}
+
+function check_login($force_login=false) {
+	global $config;
+
+	$cookie_life = !empty($config['cookie_life']) ? $config['cookie_life'] : 3600;
+
+	if(isset($_COOKIE['newsbox']) || $force_login == true) {
+		$hash = hash('sha256', $config['install_signature']);
+		if((isset($_COOKIE['newsbox']) && $_COOKIE['newsbox'] === $hash) || $force_login == true) {
+			// correct auth data, extend cookie life
+			$host = get_host(false); // cookies are port-agnostic
+			$domain = ($host != 'localhost') ? $host : false;
+			setcookie('newsbox', $hash, NOW_UNIX+$cookie_life, '/', $domain, false);
+			return true;
+		} else {
+			// invalid cookie data
+			unset($_COOKIE['newsbox']);
+			setcookie('newsbox', '', NOW_UNIX-3600, '/', false, false);
+		}
+	}
+
+	return false;
 }
 
 // CLIENT 
@@ -103,8 +125,8 @@ function client_register($mac_addr) {
 		$statement = $db->prepare('INSERT INTO clients(macaddr,passkey, lastseen,created_at) VALUES (:mac_addr, :passkey, :lastseen,:created_at)');
 		$statement->bindValue(':mac_addr', strtolower($mac_addr), PDO::PARAM_STR);
 		$statement->bindValue(':passkey', generate_random_string(), PDO::PARAM_STR);
-		$statement->bindValue(':lastseen', NOW, PDO::PARAM_STR);
-		$statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
+		$statement->bindValue(':lastseen', NOW_ISO, PDO::PARAM_STR);
+		$statement->bindValue(':created_at', NOW_ISO, PDO::PARAM_STR);
 		$statement->execute();
 	}
 	//return $statement->rowCount();
@@ -115,10 +137,10 @@ function client_update_lastseen($mac_addr) {
 	global $db;
 	if(empty($db)) return false;
 	if (TRUE) {
-		$statement = $db->prepare('UPDATE clients SET lastseen = '.NOW.' WHERE macaddr = ');
+		$statement = $db->prepare('UPDATE clients SET lastseen = '.NOW_ISO.' WHERE macaddr = ');
 		$statement->bindValue(':macaddr', strtolower($mac_addr), PDO::PARAM_STR);
 		
-		$statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
+		$statement->bindValue(':created_at', NOW_ISO, PDO::PARAM_STR);
 		$statement->execute();
 	}
 	return $statement->rowCount();
@@ -149,7 +171,7 @@ function client_get_passkey($mac_addr){
 }
 
 // MESSAGES
-function msg_insert($arr_post, $timestamp=NOW) {
+function msg_insert($arr_post, $timestamp=NOW_ISO) {
 	global $db;
 	if(empty($db)) return false;
 
@@ -158,7 +180,7 @@ function msg_insert($arr_post, $timestamp=NOW) {
 	$statement->bindValue(':line2', $arr_post['line2'], PDO::PARAM_STR);
     $statement->bindValue(':line3', $arr_post['line3'], PDO::PARAM_STR);
     $statement->bindValue(':validfrom', $arr_post['validfrom'], PDO::PARAM_STR);
-    $statement->bindValue(':created_at', NOW, PDO::PARAM_STR);
+    $statement->bindValue(':created_at', NOW_ISO, PDO::PARAM_STR);
 	$statement->execute();
 
     return $db->lastInsertId();

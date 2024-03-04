@@ -6,10 +6,10 @@
 		if($_POST['user'] === $config['admin_user'] && password_verify($_POST['pass'], $config['admin_pass'])) {
 			$host = get_host(false); // cookies are port-agnostic
 			$domain = ($host != 'localhost') ? $host : false;
-			$hash = hash('sha256', $config['installation_signature']);
-			setcookie('microblog_login', $hash, NOW+$config['cookie_life'], '/', $domain, false);
+			$hash = hash('sha256', $config['install_signature']);
+			setcookie('newsbox', $hash, NOW_UNIX+$config['cookie_life'], '/', $domain, false);
 
-			header('Location: '.$config['url']);
+			header('Location: '.$config['url'].DS.'msglist');
 			die();
 		} else {
 			header('HTTP/1.0 401 Unauthorized');

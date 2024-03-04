@@ -43,7 +43,7 @@ if ( client_check($mac_addr) == 1 ) {
 
 } else {
     $clientStatus = "unknown";
-   
+    client_register($mac_addr);
     $replacements = array('Zeile3'=> 'Dein PassKey:' . client_get_passkey($mac_addr)['passkey'] );
     $msg = array_replace($msg_not_registered,$replacements);
     send_msg($msg);
