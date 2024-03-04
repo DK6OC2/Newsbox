@@ -27,3 +27,4 @@ src/config.h
 public_html/.DS_Store
 public_html/config.php
 public_html/newsbox.db 
+.vscode/launch.json
