@@ -1,3 +1,8 @@
+/*
+******************************************************************************************************
+* Newsbox-Projekt des OVV R01 und R04                                                                *
+******************************************************************************************************
+*/
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
 #include <Wire.h>
@@ -10,11 +15,7 @@
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
 #endif
-#ifdef DISPLAY_OLED096 // für 1,3" OLEDS
-#include "U8g2lib.h"
-U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
-#endif
-#ifdef DISPLAY_OLED13 // für 0,96" OLEDS
+#if defined (DISPLAY_OLED096) || defined (DISPLAY_OLED13) // für 0,96 oder 1,3" OLEDS
 #include "U8g2lib.h"
 U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 #endif
@@ -85,24 +86,28 @@ void setup()
   Serial.println("MAC: "+MacAddr);
   #ifdef DISPLAY_2004
   lcd.setCursor(0, 0);
+  lcd.print("Newsbox-Projekt");
+  lcd.setCursor(0,1);
   lcd.print(Rufzeichen);
-  lcd.setCursor(10, 0);
+  lcd.setCursor(10, 1);
   lcd.print(Locator);
-  lcd.setCursor(0, 1);
+  lcd.setCursor(0, 2);
   lcd.print("Mac: "+MacAddr);
   #endif
   #ifdef DISPLAY_OLED096
-  oled.drawStr(0,15, Rufzeichen);
-  oled.drawStr(70,15, Locator);
-  oled.drawStr(0,30, "Mac: ");
-  oled.drawStr(25,30, MacAddr.c_str());
+  oled.drawStr(0,15, "Newsbox-Projekt");
+  oled.drawStr(0,30, Rufzeichen);
+  oled.drawStr(70,30, Locator);
+  oled.drawStr(0,40, "Mac: ");
+  oled.drawStr(25,40, MacAddr.c_str());
   oled.sendBuffer();
   #endif
   #ifdef DISPLAY_OLED13
-  oled.drawStr(2,15, Rufzeichen);
-  oled.drawStr(70,15, Locator);
-  oled.drawStr(2,30, "Mac: ");
-  oled.drawStr(27,30, MacAddr.c_str());
+  oled.drawStr(2,15, "Newsbox-Projekt");
+  oled.drawStr(2,36, Rufzeichen);
+  oled.drawStr(70,36, Locator);
+  oled.drawStr(2,50, "Mac: ");
+  oled.drawStr(27,50, MacAddr.c_str());
   oled.sendBuffer();
   #endif
   delay(3000);
