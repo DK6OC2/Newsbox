@@ -72,7 +72,7 @@
 			(plotinvisibletext no)
 			(sketchpadsonfab no)
 			(subtractmaskfromsilk no)
-			(outputformat 5)
+			(outputformat 4)
 			(mirror yes)
 			(drillshape 2)
 			(scaleselection 1)
