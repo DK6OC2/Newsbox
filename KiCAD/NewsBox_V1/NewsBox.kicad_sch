@@ -4,6 +4,11 @@
 	(generator_version "8.0")
 	(uuid "7d74e282-4c6e-479b-9de8-0ddebdf74a16")
 	(paper "A4")
+	(title_block
+		(title "NewsBox Projekt")
+		(date "2024-03-06")
+		(rev "1.0")
+	)
 	(lib_symbols
 		(symbol "Conn_01x15_Socket_1"
 			(pin_names
