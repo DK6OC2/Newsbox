@@ -140,8 +140,7 @@ void loop()
            Serial.print(F("deserializeJson() failed with code "));
            Serial.println(err.f_str());
            news_id = "ERROR";
-           news_topic = "ERROR ";
-           news_topic += err.f_str();
+           news_topic = "ERROR "+err.f_str();
            news_zeile1 = "";
            news_zeile2 = "Nachrichtenfehler!";
            news_zeile3 = "Bitte warten ...";
