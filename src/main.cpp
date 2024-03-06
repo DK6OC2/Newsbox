@@ -66,7 +66,7 @@ void setup()
   oled.setFont(u8g2_font_6x13_tr);
   #endif
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+  WiFi.begin(WIFI_SSID[1], WIFI_PASSWORD[1]);
   Serial.println("Connecting to WiFi");
   while (WiFi.status() != WL_CONNECTED)
   {
