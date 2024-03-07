@@ -1,15 +1,16 @@
 #include <WiFi.h>
 #include <WiFiClientSecure.h>
+#include <WiFiMulti.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <HTTPClient.h>
 #include <config.h>
+WiFiMulti wifiMulti;
 
 //LiquidCrystal_I2C lcd(0x27, 16, 2);                 // für 2 Zeilen Displays
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 // für 4 Zeilen Displays
 
-//const int DISPLAY_WIDTH = 16; // Definition fürs Display
-const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
+const uint32_t connectTimeoutMs = 10000;
 byte mac[6];   // byte-array für Mac-Adresse
 String payload; // Variable für Nachricht
 String old_payload = "empty"; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
