@@ -4,11 +4,17 @@
 ******************************************************************************************************
 */
 #include <WiFi.h>
+#include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 #include <Wire.h>
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
+
+WiFiMulti wifiMulti;
+
+// WiFi connect timeout per AP. Increase when connecting takes longer.
+const uint32_t connectTimeoutMs = 20000;
 
 #ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
 #include <LiquidCrystal_I2C.h>
@@ -41,7 +47,7 @@ int B_lastState = LOW;  // the previous state from the input pin
 int B_currentState;     // the current reading from the input pin
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
 WiFiClientSecure *client = new WiFiClientSecure ; // initialisieren des WifiClients mit SSL
-
+bool new_wifi = true ; // Flag für neue Wifi-Verbindung nach Verbindungsverlust
 
 // LCD initialisieren und Starttexte anzeigen
 void setup()
@@ -66,16 +72,46 @@ void setup()
   oled.setFont(u8g2_font_6x13_tr);
   #endif
 
-  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.println("Connecting to WiFi");
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
+  WiFi.mode(WIFI_STA);
+  
+  // Add list of wifi networks
+  wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
+  wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
+  wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
+  wifiMulti.addAP(WIFI_SSID4, WIFI_PASSWORD4);
+  wifiMulti.addAP(WIFI_SSID5, WIFI_PASSWORD5);
+
+ // WiFi.scanNetworks will return the number of networks found
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0) {
+      Serial.println("no networks found");
+  } 
+  else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i) {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+      delay(10);
+    }
   }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
+
+  // Connect to Wi-Fi using wifiMulti (connects to the SSID with strongest connection)
+  Serial.println("Connecting Wifi...");
+  if(wifiMulti.run() == WL_CONNECTED) {
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+    new_wifi = false;
+  }
   WiFi.macAddress(mac);
   MacAddr += String(mac[5],HEX);
   MacAddr += String(mac[4],HEX);
@@ -119,6 +155,19 @@ void setup()
 
 void loop()
 {
+   if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+    if (new_wifi)
+      {
+    Serial.print("WiFi connected: ");
+    Serial.print(WiFi.SSID());
+    Serial.print(" ");
+    Serial.println(WiFi.RSSI());
+      }
+  }
+  else {
+    Serial.println("WiFi not connected!");
+    new_wifi = true;
+  }
   client->setInsecure(); // ignoriere SSL-Cert
   
   HTTPClient http ; //Webclient starten
@@ -139,8 +188,8 @@ void loop()
       {
            Serial.print(F("deserializeJson() failed with code "));
            Serial.println(err.f_str());
-           news_id = "ERROR";
-           news_topic = "ERROR "+err.f_str();
+           news_id = 0;
+           news_topic = "ERROR";
            news_zeile1 = "";
            news_zeile2 = "Nachrichtenfehler!";
            news_zeile3 = "Bitte warten ...";
