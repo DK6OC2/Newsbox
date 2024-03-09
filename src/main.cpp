@@ -19,22 +19,21 @@ const uint32_t connectTimeoutMs = 20000;
 #ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 
-const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
 #endif
 #if defined (DISPLAY_OLED096) || defined (DISPLAY_OLED13) // für 0,96 oder 1,3" OLEDS
 #include "U8g2lib.h"
 U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 #endif
-byte mac[6];   // byte-array für Mac-Adresse
+byte mac[6];   // byte-array for Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
-//Variablen für Nachricht
+//variables for message 
 long news_id;
-const char* news_datum;
+const char* news_date;
 const char* news_topic;
-const char* news_zeile1;
-const char* news_zeile2;
-const char* news_zeile3;
+const char* news_line1;
+const char* news_line2;
+const char* news_line3;
 long old_id; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
 String MacAddr;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
@@ -190,18 +189,18 @@ void loop()
            Serial.println(err.f_str());
            news_id = 0;
            news_topic = "ERROR";
-           news_zeile1 = "";
-           news_zeile2 = "Nachrichtenfehler!";
-           news_zeile3 = "Bitte warten ...";
+           news_line1 = "";
+           news_line2 = "Nachrichtenfehler!";
+           news_line3 = "Bitte warten ...";
       }
       else
       {
         news_id = doc["ID"];
-        news_datum = doc["Datum"];
-        news_topic = doc["Message"]["Topic"];
-        news_zeile1 = doc["Message"]["Zeile1"];
-        news_zeile2 = doc["Message"]["Zeile2"];
-        news_zeile3 = doc["Message"]["Zeile3"];
+        news_date = doc["date"];
+        news_topic = doc["message"]["topic"];
+        news_line1 = doc["Message"]["line1"];
+        news_line2 = doc["Message"]["line2"];
+        news_line3 = doc["Message"]["line3"];
       }
     } 
     else 
@@ -223,35 +222,35 @@ void loop()
       lcd.setCursor(0, 0);
       lcd.print(news_topic);
       lcd.setCursor(10, 0);
-      lcd.print(news_datum);
+      lcd.print(news_date);
       lcd.setCursor(0, 1);
-      lcd.print(news_zeile1);
+      lcd.print(news_line1);
       lcd.setCursor(0, 2);
-      lcd.print(news_zeile2);
+      lcd.print(news_line2);
       lcd.setCursor(0, 3);
-      lcd.print(news_zeile3);
+      lcd.print(news_line3);
       #endif
       #ifdef DISPLAY_OLED096
       oled.clear();  // Display löschen für neue Nachrichte 
       //Schreibe Nachricht aufs Display wenn 2-zeilig
       oled.drawStr(0,15, news_topic);
-      oled.drawStr(60,15, news_datum);
-      oled.drawStr(0,30, news_zeile1);
-      oled.drawStr(0,40, news_zeile2);
-      oled.drawStr(0,50, news_zeile3);
+      oled.drawStr(60,15, news_date);
+      oled.drawStr(0,30, news_line1);
+      oled.drawStr(0,40, news_line2);
+      oled.drawStr(0,50, news_line3);
       oled.sendBuffer();
       #endif
       #ifdef DISPLAY_OLED13
       oled.clear();  // Display löschen für neue Nachrichte 
       //Schreibe Nachricht aufs Display wenn 2-zeilig
       oled.drawStr(2,15, news_topic);
-      oled.drawStr(65,15, news_datum);
-      oled.drawStr(2,36, news_zeile1);
-      oled.drawStr(2,50, news_zeile2);
-      oled.drawStr(2,64, news_zeile3);
+      oled.drawStr(65,15, news_date);
+      oled.drawStr(2,36, news_line1);
+      oled.drawStr(2,50, news_line2);
+      oled.drawStr(2,64, news_line3);
       oled.sendBuffer();
       #endif
-      old_id = news_id; //Sichere alte Nachricht zum Vergleich
+      old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
       digitalWrite(LED_PIN, HIGH); // Schalte LED ein
       #ifdef BUZZER_PASSIVE
       tone(buzzer_pin, 1000, 1000);
