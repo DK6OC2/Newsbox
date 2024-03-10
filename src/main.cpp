@@ -189,12 +189,11 @@ void loop()
       {
            Serial.print(F("deserializeJson() failed with code: "));
            Serial.println(err.f_str());
-           news_id = 0;
+           news_id = 10;
            news_topic = "ERROR";
            news_line1 = "";
            news_line2 = "Nachrichtenfehler!";
            news_line3 = "Bitte warten ...";
-           Serial.print(JSonMessage);
       }
       else
       {
