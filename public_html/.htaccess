@@ -18,7 +18,6 @@ AddType application/json .json
   RewriteBase /
   
   # friendly URLs
-  RewriteRule ^feed/json/?$ feed/feed.json [L]
     
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteCond %{REQUEST_FILENAME} !-d

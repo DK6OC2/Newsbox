@@ -212,7 +212,7 @@ function msg_select_latest() {
     global $db;
 	if(empty($db)) return false;
 
-    $statement = $db->prepare('SELECT line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
+    $statement = $db->prepare('SELECT id,line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
 	$statement->execute();
 	$row = $statement->fetch(PDO::FETCH_ASSOC);
 

@@ -9,10 +9,10 @@ function send_msg($arr_msg){
     header('Content-Type: application/json; charset=utf-8');
     
     $string_to_send = array (
-        'ID' => '0815',
-        'Topic' => 't.b.d.',
-        'Date' =>  date("Y.m.d"), 
-        'Message' => $arr_msg
+        'ID' => '0815', // DB id of messages
+        'topic' => 't.b.d.',
+        'date' =>  date("Y.m.d"), 
+        'message' => $arr_msg
     );
     print json_encode($string_to_send);
 }
@@ -23,9 +23,14 @@ $mac_addr = path(1);
 // check if mac is missing
 if (empty($mac_addr)) {
     $msg = array(
-        'Topic'	 => 'E409',
-        'Zeile1' => ' - E R R O R - ',
-        'Zeile2' => ' Missing Addr ',
+        'ID' = 0,
+        'topic' = 'setup',
+        'message' => array (
+        'topic'	 => 'E409',
+        'line1' => ' - E R R O R - ',
+        'line2' => ' Missing Addr ',
+        'line3' => ''
+        )
     );
     send_msg($msg);
     exit;
@@ -34,10 +39,14 @@ if (empty($mac_addr)) {
 // check if max is 12 char
 if (strlen($mac_addr) !== 12 ){
     $msg = array(
-        'Topic'	 => 'E409',
-        'Zeile1' => ' - E R R O R - ',
-        'Zeile2' => substr($mac_addr, 0, 20),
-        'Zeile3' => 'is not a mac addr!'
+        'ID' = 0,
+        'topic' = 'setup',
+        'message' => array (
+            'topic'	 => 'E409',
+            'line1' => ' - E R R O R - ',
+            'line2' => substr($mac_addr, 0, 20),
+            'line3' => 'is not a mac addr!'
+        )
     );
     send_msg($msg);
     exit;
@@ -51,7 +60,7 @@ if ( client_check($mac_addr) == 1 ) {
 } else {
     $clientStatus = "unknown";
     client_register($mac_addr);
-    $replacements = array('line3'=> 'Dein PassKey:' . client_get_passkey($mac_addr)['passkey'] );
+    $replacements = array('line3'=> 'Your PassKey:' . client_get_passkey($mac_addr)['passkey'] );
     $msg = array_replace($msg_not_registered,$replacements);
     send_msg($msg);
 }
