@@ -11,6 +11,7 @@ DEFINE('DS', DIRECTORY_SEPARATOR);
 DEFINE('NL', "\n");
 DEFINE('NOW_ISO', date("c")); // ISO8601 Format
 DEFINE('NOW_UNIX', time()); // Unix timestamp (needed by cookie)
+DEFINE('NOW_DISP', date("d.m.Y")); //Date at Display
 
 /* make the path easier to read */
 $dir = dirname($_SERVER['SCRIPT_NAME']);
@@ -68,6 +69,7 @@ unset($dir, $uri, $path_fragments, $path);
 
 /* not registered message */
 $msg_not_registered = array(
+	'date' => NOW_DISP,
 	'topic'	=> 'Anmeldung',          //max 9char
 	'line1' => 'Registrierung',      //max 20char
 	'line2' => 'erfolgreich',        //max 20char
