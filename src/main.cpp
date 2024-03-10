@@ -249,7 +249,7 @@ void loop()
       oled.drawStr(65,15, news_date);
       oled.drawStr(2,36, news_line1);
       oled.drawStr(2,50, news_line2);
-      oled.drawStr(2,64, news_line3);
+      oled.drawStr(2,63, news_line3);
       oled.sendBuffer();
       #endif
       old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
