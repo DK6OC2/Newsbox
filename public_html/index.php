@@ -30,9 +30,11 @@
 	$page = mb_strtolower(path(0));
 	switch($page) {
 		case 'login':
+			$template = 'Login';
 			require_once(ROOT.DS.'templates'.DS.'loginform.inc.php');
 			break;
 		case 'logout':
+			$template = 'Logout';
 			$host = get_host(false); // cookies are port-agnostic
 			$domain = ($host != 'localhost') ? $host : false;
 			setcookie('newsbox', '', time()-3600, '/', $domain, false);
@@ -41,18 +43,27 @@
 			header('Location: '.$config['url']);
 			break;
 		case 'message':
-			$mac_addr = $_GET["mac"];
+			$mac_addr = $_GET["mac"];  // simular to  like path(1)
 			require_once(ROOT.DS.'message.php');
 			break;
 		case 'msgnew':
+			$template = 'New Message';
 			require_once(ROOT.DS.'templates'.DS.'msgnew.inc.php');
 			break;
+		case 'msgedit':
+			$template = 'Edit Message';
+			break;
 		case 'msglist':
+			$template = 'List Messages';
 			require_once(ROOT.DS.'templates'.DS.'msglist.inc.php');
 			break;
 		case 'settings':
-			$template = 'settings';
+			$template = 'Settings';
 			require_once(ROOT.DS.'templates'.DS.'settings.inc.php');
+			break;
+		case 'clientconfig':
+			$template = 'Client Configuration';
+			require_once(ROOT.DS.'templates'.DS.'clientconfig.inc.php');
 			break;
 		case 'recovery':
 			// password recovery via email
