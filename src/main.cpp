@@ -72,45 +72,6 @@ void setup()
   #endif
 
   WiFi.mode(WIFI_STA);
-  
-  // Add list of wifi networks
-  wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
-  wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
-  wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
-  wifiMulti.addAP(WIFI_SSID4, WIFI_PASSWORD4);
-  wifiMulti.addAP(WIFI_SSID5, WIFI_PASSWORD5);
-
- // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0) {
-      Serial.println("no networks found");
-  } 
-  else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    for (int i = 0; i < n; ++i) {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
-      delay(10);
-    }
-  }
-
-  // Connect to Wi-Fi using wifiMulti (connects to the SSID with strongest connection)
-  Serial.println("Connecting Wifi...");
-  if(wifiMulti.run() == WL_CONNECTED) {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-    new_wifi = false;
-  }
   WiFi.macAddress(mac);
   MacAddr += String(mac[5],HEX);
   MacAddr += String(mac[4],HEX);
@@ -150,6 +111,46 @@ void setup()
   pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(buzzer_pin, OUTPUT);
   digitalWrite(LED_PIN, LOW);
+  
+  // Add list of wifi networks
+  wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
+  wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
+  wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
+  wifiMulti.addAP(WIFI_SSID4, WIFI_PASSWORD4);
+  wifiMulti.addAP(WIFI_SSID5, WIFI_PASSWORD5);
+
+ // WiFi.scanNetworks will return the number of networks found
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0) {
+      Serial.println("no networks found");
+  } 
+  else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i) {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
+      delay(10);
+    }
+  }
+
+  // Connect to Wi-Fi using wifiMulti (connects to the SSID with strongest connection)
+  Serial.println("Connecting Wifi...");
+  if(wifiMulti.run() == WL_CONNECTED) {
+    Serial.println("");
+    Serial.println("WiFi connected");
+    Serial.println("IP address: ");
+    Serial.println(WiFi.localIP());
+    new_wifi = false;
+  }
+  
 }
 
 void loop()
@@ -161,6 +162,7 @@ void loop()
     Serial.print(WiFi.SSID());
     Serial.print(" ");
     Serial.println(WiFi.RSSI());
+    new_wifi = false;
       }
   }
   else {
@@ -185,22 +187,23 @@ void loop()
       DeserializationError err = deserializeJson(doc, JSonMessage); //Parse message   
       if (err) 
       {
-           Serial.print(F("deserializeJson() failed with code "));
+           Serial.print(F("deserializeJson() failed with code: "));
            Serial.println(err.f_str());
            news_id = 0;
            news_topic = "ERROR";
            news_line1 = "";
            news_line2 = "Nachrichtenfehler!";
            news_line3 = "Bitte warten ...";
+           Serial.print(JSonMessage);
       }
       else
       {
         news_id = doc["ID"];
         news_date = doc["date"];
         news_topic = doc["message"]["topic"];
-        news_line1 = doc["Message"]["line1"];
-        news_line2 = doc["Message"]["line2"];
-        news_line3 = doc["Message"]["line3"];
+        news_line1 = doc["message"]["line1"];
+        news_line2 = doc["message"]["line2"];
+        news_line3 = doc["message"]["line3"];
       }
     } 
     else 
