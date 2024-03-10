@@ -36,8 +36,8 @@ if($db_version == 0) {
             `line2` TEXT,
             `line3` TEXT,
 			`validfrom` TEXT,
-			`modified_at` TEXT,
-			`created_at` TEXT
+			`created_at` TEXT,
+			`modified_at` TEXT
 		    );
 			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
 			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
@@ -56,6 +56,7 @@ if($db_version == 0) {
                 `macaddr` TEXT UNIQUE,
                 `callsign` TEXT,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
                 `ov` TEXT,
+				`locator` TEXT,
 				`passkey` TEXT,
 				`lastseen` TEXT,
 				`created_at` TEXT

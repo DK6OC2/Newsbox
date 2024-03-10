@@ -7,7 +7,14 @@
 
 function send_msg($arr_msg){
     header('Content-Type: application/json; charset=utf-8');
-    print json_encode($arr_msg);
+    
+    $string_to_send = array (
+        'ID' => '0815',
+        'Topic' => 't.b.d.',
+        'Date' =>  date("Y.m.d"), 
+        'Message' => $arr_msg
+    );
+    print json_encode($string_to_send);
 }
 
 // set variable
@@ -44,7 +51,7 @@ if ( client_check($mac_addr) == 1 ) {
 } else {
     $clientStatus = "unknown";
     client_register($mac_addr);
-    $replacements = array('Zeile3'=> 'Dein PassKey:' . client_get_passkey($mac_addr)['passkey'] );
+    $replacements = array('line3'=> 'Dein PassKey:' . client_get_passkey($mac_addr)['passkey'] );
     $msg = array_replace($msg_not_registered,$replacements);
     send_msg($msg);
 }

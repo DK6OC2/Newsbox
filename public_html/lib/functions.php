@@ -171,16 +171,16 @@ function client_get_passkey($mac_addr){
 }
 
 // MESSAGES
-function msg_insert($arr_post, $timestamp=NOW_ISO) {
+function msg_insert($arr_content, $timestamp=NOW_ISO) {
 	global $db;
 	if(empty($db)) return false;
 
-	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) VALUES (:category, :1line, :2line, :3line, :4line, :validfrom_timestamp, :creation_timestamp)');
-	$statement->bindValue(':line1', $arr_post['line1'], PDO::PARAM_INT);
-	$statement->bindValue(':line2', $arr_post['line2'], PDO::PARAM_STR);
-    $statement->bindValue(':line3', $arr_post['line3'], PDO::PARAM_STR);
-    $statement->bindValue(':validfrom', $arr_post['validfrom'], PDO::PARAM_STR);
-    $statement->bindValue(':created_at', NOW_ISO, PDO::PARAM_STR);
+	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) VALUES (:line1, :line2, :line3, :validfrom, :created_at)');
+	$statement->bindValue(':line1', $arr_content['line1'], PDO::PARAM_INT);
+	$statement->bindValue(':line2', $arr_content['line2'], PDO::PARAM_STR);
+    $statement->bindValue(':line3', $arr_content['line3'], PDO::PARAM_STR);
+    $statement->bindValue(':validfrom', $arr_content['validfrom'], PDO::PARAM_STR);
+    $statement->bindValue(':created_at', $timestamp, PDO::PARAM_STR);
 	$statement->execute();
 
     return $db->lastInsertId();
