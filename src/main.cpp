@@ -6,12 +6,11 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
+#include <WiFiMulti.h>
 #include <Wire.h>
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
-
-WiFiMulti wifiMulti;
 
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 20000;
@@ -35,6 +34,7 @@ const char* news_line1;
 const char* news_line2;
 const char* news_line3;
 long old_id; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
+
 String MacAddr;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
