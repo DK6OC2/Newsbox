@@ -23,7 +23,7 @@ $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
 $install_signature = bin2hex(random_bytes(16));
 
 /* set up database */
-require_once(ROOT.DS.'lib'.DS.'database.php');
+require_once(ROOT.DS.'inc'.DS.'database.php');
 
 /* load settings_raw */
 $statement = $db->prepare('SELECT * FROM settings');
@@ -75,4 +75,4 @@ $msg_not_registered = array(
 );
 
 /* load functions */
-require_once(ROOT.DS.'lib'.DS.'functions.php');
+require_once(ROOT.DS.'inc'.DS.'functions.php');
