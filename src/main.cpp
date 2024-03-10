@@ -49,9 +49,15 @@ int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 
+/* PIN Settings für az-delivery-devkit-v4 */
 int LED_PIN = 2; //Anschluss für LED
-int BUTTON_PIN = 12; //Anschluss für Bestätigungstaste
-int BUZZER_PIN = 13; //Anschluss für Buzzer
+int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
+int BUZZER_PIN = 5; //Anschluss für Buzzer
+
+/* PIN Settings für lolin32oled */
+//int LED_PIN = 2; //Anschluss für LED
+//int BUTTON_PIN = 12; //Anschluss für Bestätigungstaste
+//int BUZZER_PIN = 13; //Anschluss für Buzzer
 
 int B_lastState = LOW;  // the previous state from the input pin
 int B_currentState;     // the current reading from the input pin
