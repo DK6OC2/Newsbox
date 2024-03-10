@@ -20,5 +20,11 @@
 # Apple 
 .DS_Store
 
-# The Project Config File
+# Client Config File
 src/config.h
+
+# Webserver Files
+public_html/.DS_Store
+public_html/config.php
+public_html/newsbox.db 
+.vscode/launch.json
