@@ -68,7 +68,7 @@ unset($dir, $uri, $path_fragments, $path);
 
 /* not registered message */
 $msg_not_registered = array(
-	'topic'	 => 'Anmeldung',          //max 9char
+	'topic'	=> 'Anmeldung',          //max 9char
 	'line1' => 'Registrierung',      //max 20char
 	'line2' => 'erfolgreich',        //max 20char
 	'line3' => 'Dein PassKey: xxxxx' //max 20char

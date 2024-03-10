@@ -32,6 +32,7 @@ if($db_version == 0) {
 
 			CREATE TABLE IF NOT EXISTS `messages` (
 			`id` INTEGER PRIMARY KEY NOT NULL,
+			`topic`TEXT,
             `line1` TEXT,
             `line2` TEXT,
             `line3` TEXT,
@@ -39,8 +40,8 @@ if($db_version == 0) {
 			`created_at` TEXT,
 			`modified_at` TEXT
 		    );
-			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
-			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
+			INSERT INTO `messages` (topic, line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '1. Zeile', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
+			INSERT INTO `messages` (topic, line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '1. Zeile', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
 
 			CREATE TABLE IF NOT EXISTS `map_messages_topics` (
 				`id` INTEGER PRIMARY KEY NOT NULL,

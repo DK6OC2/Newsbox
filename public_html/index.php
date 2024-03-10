@@ -41,6 +41,7 @@
 			header('Location: '.$config['url']);
 			break;
 		case 'message':
+			$mac_addr = $_GET["mac"];
 			require_once(ROOT.DS.'message.php');
 			break;
 		case 'msgnew':

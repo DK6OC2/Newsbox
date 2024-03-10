@@ -23,6 +23,7 @@ const char* Locator = "XX99ab";                            // eigener Locator
 #define DISPLAY_2004
 //#define DISPLAY_OLED13
 //#define DISPLAY_OLED096
+//#define DISPLAY_OLED096_SSD1306
 
 // Buzzer-Typ
 #define BUZZER_PASSIVE
