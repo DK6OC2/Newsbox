@@ -208,6 +208,19 @@ void loop()
   //Nachricht holen, wenn erster Durchlauf oder Intervall abgelaufen ist
   if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
     {
+      //setze Abrufsignal ('*')
+      #ifdef DISPLAY_2004
+      lcd.setCursor(0, 9);
+      lcd.print("*");
+      #endif
+      #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
+      oled.drawStr(55,15, "*");
+      oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_OLED13
+      oled.drawStr(60,15, "*");
+      oled.sendBuffer();
+      #endif
       Serial.println("Fetching ... "+URL);
       http.begin(*client, URL+"?mac="+MacAddr+"&call="+Rufzeichen+"&loc="+Locator); //Verbindung zum Server aufbauen
       http.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -265,21 +278,19 @@ void loop()
 
         #ifdef DISPLAY_2004
         lcd.clear();  // Display löschen für neue Nachrichte 
-        //Schreibe Nachricht aufs Display wenn 2-zeilig
-          lcd.setCursor(0, 0);
-          lcd.print(news_topic);
-          lcd.setCursor(10, 0);
-          lcd.print(news_date);
-          lcd.setCursor(0, 1);
-          lcd.print(news_line1);
-          lcd.setCursor(0, 2);
-          lcd.print(news_line2);
-          lcd.setCursor(0, 3);
-          lcd.print(news_line3);
+        lcd.setCursor(0, 0);
+        lcd.print(news_topic);
+        lcd.setCursor(10, 0);
+        lcd.print(news_date);
+        lcd.setCursor(0, 1);
+        lcd.print(news_line1);
+        lcd.setCursor(0, 2);
+        lcd.print(news_line2);
+        lcd.setCursor(0, 3);
+        lcd.print(news_line3);
         #endif
         #ifdef DISPLAY_OLED096
         oled.clear();  // Display löschen für neue Nachrichte 
-        //Schreibe Nachricht aufs Display wenn 2-zeilig
         oled.drawStr(0,15, news_topic);
         oled.drawStr(60,15, news_date);
         oled.drawStr(0,30, news_line1);
@@ -289,7 +300,6 @@ void loop()
         #endif
         #ifdef DISPLAY_OLED13
         oled.clear();  // Display löschen für neue Nachrichte 
-        //Schreibe Nachricht aufs Display wenn 2-zeilig
         oled.drawStr(2,15, news_topic);
         oled.drawStr(65,15, news_date);
         oled.drawStr(2,36, news_line1);
@@ -299,7 +309,6 @@ void loop()
         #endif
         #ifdef DISPLAY_OLED096_SSD1306
         oled.clear();  // Display löschen für neue Nachrichte 
-        //Schreibe Nachricht aufs Display wenn 2-zeilig
         oled.drawStr(0,15, news_topic);
         oled.drawStr(60,15, news_date);
         oled.drawStr(0,30, news_line1);
@@ -309,7 +318,6 @@ void loop()
         #endif
 
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
-        
         
         digitalWrite(LED_PIN, HIGH); // Schalte LED ein
         #ifdef BUZZER_PASSIVE
@@ -322,7 +330,22 @@ void loop()
         #endif      
         
       }
-    
+      else
+      {
+      //Entferne Abrufsignal ('*')
+      #ifdef DISPLAY_2004
+      lcd.setCursor(0, 9);
+      lcd.print(" ");
+      #endif
+      #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
+      oled.drawStr(55,15, " ");
+      oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_OLED13
+      oled.drawStr(60,15, " ");
+      oled.sendBuffer();
+      #endif
+      }
     
     B_currentState = digitalRead(BUTTON_PIN);
     
