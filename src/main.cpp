@@ -29,7 +29,7 @@ const uint32_t connectTimeoutMs = 20000;
 #endif
 #if defined (DISPLAY_OLED096_SSD1306)
   #include "U8g2lib.h"
-  U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, 4, 5);
+  U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, I2C_SDA, I2C_SCL);
 #endif
 
 byte mac[6];   // byte-array for Mac-Adresse
@@ -50,14 +50,14 @@ unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 
 /* PIN Settings für az-delivery-devkit-v4 */
-int LED_PIN = 2; //Anschluss für LED
-int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
-int BUZZER_PIN = 5; //Anschluss für Buzzer
+//int LED_PIN = 2; //Anschluss für LED
+//int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
+//int BUZZER_PIN = 5; //Anschluss für Buzzer
 
 /* PIN Settings für lolin32oled */
-//int LED_PIN = 2; //Anschluss für LED
-//int BUTTON_PIN = 12; //Anschluss für Bestätigungstaste
-//int BUZZER_PIN = 13; //Anschluss für Buzzer
+int LED_PIN = 2; //Anschluss für LED
+int BUTTON_PIN = 15; //Anschluss für Bestätigungstaste
+int BUZZER_PIN = 14; //Anschluss für Buzzer
 
 int B_lastState = LOW;  // the previous state from the input pin
 int B_currentState;     // the current reading from the input pin
@@ -75,7 +75,7 @@ void setup()
 
   // LCD
   #ifdef DISPLAY_2004
-  lcd.init();
+  lcd.init(I2C_SDA, I2C_SCL);
   lcd.backlight();
   #endif
   #ifdef DISPLAY_OLED096
@@ -266,16 +266,16 @@ void loop()
         #ifdef DISPLAY_2004
         lcd.clear();  // Display löschen für neue Nachrichte 
         //Schreibe Nachricht aufs Display wenn 2-zeilig
-        lcd.setCursor(0, 0);
-        lcd.print(news_topic);
-        lcd.setCursor(10, 0);
-        lcd.print(news_date);
-        lcd.setCursor(0, 1);
-        lcd.print(news_line1);
-        lcd.setCursor(0, 2);
-        lcd.print(news_line2);
-        lcd.setCursor(0, 3);
-        lcd.print(news_line3);
+          lcd.setCursor(0, 0);
+          lcd.print(news_topic);
+          lcd.setCursor(10, 0);
+          lcd.print(news_date);
+          lcd.setCursor(0, 1);
+          lcd.print(news_line1);
+          lcd.setCursor(0, 2);
+          lcd.print(news_line2);
+          lcd.setCursor(0, 3);
+          lcd.print(news_line3);
         #endif
         #ifdef DISPLAY_OLED096
         oled.clear();  // Display löschen für neue Nachrichte 

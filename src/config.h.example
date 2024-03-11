@@ -25,6 +25,10 @@ const char* Locator = "XX99ab";                            // eigener Locator
 //#define DISPLAY_OLED096
 //#define DISPLAY_OLED096_SSD1306
 
+// define PINs for I2C Display connection
+#define I2C_SDA 25 // 4 onboard OLED
+#define I2C_SCL 26 // 5 onboard OLED
+
 // Buzzer-Typ
 #define BUZZER_PASSIVE
 //#define BUZZER_ACTIVE

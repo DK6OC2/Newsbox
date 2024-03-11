@@ -10,7 +10,7 @@ function send_msg($arr_msg, $id=9999){
     
     $string_to_send = array (
         'ID' => $id,
-        'date' =>  date("Y.m.d"), 
+        'date' =>  date("d.m.Y"), 
         'message' => $arr_msg
     );
     print json_encode($string_to_send);
