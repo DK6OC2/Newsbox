@@ -47,8 +47,9 @@ if (strlen($mac_addr) !== 12 ){
 // check if mac is registered
 if ( client_check($mac_addr) == 1 ) {
     $clientStatus = "known";
-    send_msg(msg_select_latest(), 100 /* muss noch die ID rein */);
-
+    [$message, $id] = msg_select_latest();
+    send_msg($message, $id /* muss noch die ID rein */);
+    
 } else {
     $clientStatus = "unknown";
     client_register($mac_addr);

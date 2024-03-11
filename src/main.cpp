@@ -91,7 +91,7 @@ void setup()
   #ifdef DISPLAY_OLED096_SSD1306
     oled.begin();
     oled.clearBuffer();
-    oled.setFont(u8g2_font_resoledbold_tr);
+    oled.setFont(u8g2_font_profont12_mf);
   #endif
 
   WiFi.mode(WIFI_STA);

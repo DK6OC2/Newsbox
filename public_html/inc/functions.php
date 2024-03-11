@@ -212,11 +212,19 @@ function msg_select_latest() {
     global $db;
 	if(empty($db)) return false;
 
-    $statement = $db->prepare('SELECT topic,line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
+    $statement = $db->prepare('SELECT id,topic,line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
 	$statement->execute();
 	$row = $statement->fetch(PDO::FETCH_ASSOC);
-
-	return (!empty($row)) ? $row : false;
+	if (!empty($row)) {	
+		$message['topic'] = $row['topic'];
+		$message['line1'] = $row['line1'];
+		$message['line2'] = $row['line2'];
+		$message['line3'] = $row['line3'];
+		$message_id = $row['id'];
+		return [$message, $message_id];
+	} else {
+		return false;
+	}
 
 }
 
