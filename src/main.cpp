@@ -198,11 +198,11 @@ void loop()
       else
       {
         news_id = doc["ID"];
-        news_date = doc["date"];
-        news_topic = doc["message"]["topic"];
-        news_line1 = doc["message"]["line1"];
-        news_line2 = doc["message"]["line2"];
-        news_line3 = doc["message"]["line3"];
+        news_date = doc["Datum"];
+        news_topic = doc["Message"]["Topic"];
+        news_line1 = doc["Message"]["Zeile1"];
+        news_line2 = doc["Message"]["Zeile2"];
+        news_line3 = doc["Message"]["Zeile3"];
       }
     } 
     else 
