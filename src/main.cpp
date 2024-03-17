@@ -17,7 +17,7 @@ WiFiMulti wifiMulti;
 boolean __DEBUG = true; 
 
 // WiFi connect timeout per AP. Increase when connecting takes longer.
-const uint32_t connectTimeoutMs = 20000;
+const uint32_t connectTimeoutMs = 10000;
 
 #ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
   #include <LiquidCrystal_I2C.h>
@@ -149,24 +149,20 @@ void setup()
     oled.sendBuffer();
   #endif
   #ifdef DISPLAY_EPAPER29
-    display.firstPage();
-    do
-    {
-       display.fillScreen(GxEPD_WHITE);
-       display.setCursor(10, 15);
-       display.setFont(&FreeMonoBold9pt7b);
-       display.print("Newsbox-Projekt");
-       display.setCursor(10, 45);
-       display.setFont(&FreeMono9pt7b);
-       display.print(Rufzeichen);
-       display.setCursor(100, 45);
-       display.print(Locator);
-       display.setCursor(10, 65);
-       display.print("Mac: ");
-       display.setCursor(100, 65);
-       display.print(MacAddr.c_str());
-       }
-    while (display.nextPage());
+    display.fillScreen(GxEPD_WHITE);
+    display.setCursor(10, 15);
+    display.setFont(&FreeMonoBold9pt7b);
+    display.print("Newsbox-Projekt");
+    display.setCursor(10, 45);
+    display.setFont(&FreeMono9pt7b);
+    display.print(Rufzeichen);
+    display.setCursor(100, 45);
+    display.print(Locator);
+    display.setCursor(10, 65);
+    display.print("Mac: ");
+    display.setCursor(100, 65);
+    display.print(MacAddr.c_str());
+    display.display(false);
   #endif
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
@@ -211,6 +207,14 @@ void setup()
     Serial.println("IP address: ");
     Serial.println(WiFi.localIP());
     new_wifi = false;
+    #ifdef DISPLAY_EPAPER29
+    display.setCursor(10, 85);
+    display.print("IP: ");
+    display.setCursor(100, 85);
+    display.print(WiFi.localIP()); 
+    display.display(true); 
+    #endif
+    delay(5000);
   }
   
 }
@@ -249,6 +253,11 @@ void loop()
       #ifdef DISPLAY_OLED13
       oled.drawStr(60,15, "*");
       oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_EPAPER29
+      display.setCursor(110, 10);
+      display.print("*");
+      display.display(true);
       #endif
       Serial.println("Fetching ... "+URL);
       http.begin(*client, URL+"?mac="+MacAddr+"&call="+Rufzeichen+"&loc="+Locator); //Verbindung zum Server aufbauen
@@ -299,8 +308,27 @@ void loop()
       http.end();
       fetchmessage = false; // Pause für den Abruf
       startTime = millis(); // Startzeit für Abruf neusetzten auf aktuellen Stand
-    } 
-
+      delay(1000); //Wartezeit für Sichtbarkeit des Abrufsignals
+      //Entferne Abrufsignal ('*')
+      #ifdef DISPLAY_2004
+      lcd.setCursor(0, 9);
+      lcd.print(" ");
+      #endif
+      #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
+      oled.drawStr(55,15, " ");
+      oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_OLED13
+      oled.drawStr(60,15, " ");
+      oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_EPAPER29
+      display.setCursor(110, 10);
+      display.setTextColor(GxEPD_WHITE);
+      display.print("*");
+      display.display(true);
+      display.setTextColor(GxEPD_BLACK);
+      #endif
     if (news_id != old_id)  //bei neuer Nachricht auf dem Server
       {
         
@@ -353,9 +381,6 @@ void loop()
         oled.sendBuffer();
         #endif
         #ifdef DISPLAY_EPAPER29
-        display.firstPage();
-        do
-        {
         display.fillScreen(GxEPD_WHITE);
         display.setCursor(10, 15);
         display.setFont(&FreeMonoBold9pt7b);
@@ -369,8 +394,7 @@ void loop()
         display.print(news_line2);
         display.setCursor(10, 85);
         display.print(news_line3);
-        }
-        while (display.nextPage());
+        display.display(false);
         #endif 
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
         
@@ -385,28 +409,13 @@ void loop()
         #endif      
         
       }
-      else
-      {
-      //Entferne Abrufsignal ('*')
-      #ifdef DISPLAY_2004
-      lcd.setCursor(0, 9);
-      lcd.print(" ");
-      #endif
-      #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
-      oled.drawStr(55,15, " ");
-      oled.sendBuffer();
-      #endif
-      #ifdef DISPLAY_OLED13
-      oled.drawStr(60,15, " ");
-      oled.sendBuffer();
-      #endif
-      }
-    
+    }
     B_currentState = digitalRead(BUTTON_PIN);
     
     if (B_lastState == HIGH && B_currentState == LOW)
+      {
       digitalWrite(LED_PIN, LOW); //Schalte LED aus wenn Taste gedrückt
-    
+      } 
     B_lastState = B_currentState; // save the the last state of the button 
     
     if (millis() - startTime >= interval)
