@@ -31,7 +31,12 @@ const uint32_t connectTimeoutMs = 20000;
   #include "U8g2lib.h"
   U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, I2C_SDA, I2C_SCL);
 #endif
-
+#ifdef DISPLAY_EPAPER29
+  #include <GxEPD2_BW.h>
+  #include <Fonts/FreeMonoBold9pt7b.h>
+  #include <Fonts/FreeMono9pt7b.h>
+  GxEPD2_BW<GxEPD2_290_T94, GxEPD2_290_T94::HEIGHT> display(GxEPD2_290_T94(/*CS=D8*/ 26, /*DC=D3*/ 25, /*RST=D4*/ 33, /*BUSY=D2*/ 27)); // GDEM029T94 128x296, SSD1680
+#endif
 byte mac[6];   // byte-array for Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
@@ -93,7 +98,12 @@ void setup()
     oled.clearBuffer();
     oled.setFont(u8g2_font_profont12_mf);
   #endif
-
+  #ifdef DISPLAY_EPAPER29
+    display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
+    display.setRotation(3);
+    display.setTextColor(GxEPD_BLACK);
+    display.setFullWindow();
+  #endif  
   WiFi.mode(WIFI_STA);
   WiFi.macAddress(mac);
   MacAddr += String(mac[5],HEX);
@@ -138,7 +148,26 @@ void setup()
     oled.drawStr(25,40, MacAddr.c_str());
     oled.sendBuffer();
   #endif
-
+  #ifdef DISPLAY_EPAPER29
+    display.firstPage();
+    do
+    {
+       display.fillScreen(GxEPD_WHITE);
+       display.setCursor(10, 15);
+       display.setFont(&FreeMonoBold9pt7b);
+       display.print("Newsbox-Projekt");
+       display.setCursor(10, 45);
+       display.setFont(&FreeMono9pt7b);
+       display.print(Rufzeichen);
+       display.setCursor(100, 45);
+       display.print(Locator);
+       display.setCursor(10, 65);
+       display.print("Mac: ");
+       display.setCursor(100, 65);
+       display.print(MacAddr.c_str());
+       }
+    while (display.nextPage());
+  #endif
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -245,11 +274,18 @@ void loop()
         else
         {
           news_id = doc["ID"];
+          /* Neuer Code für Webservervariante
           news_date = doc["date"];
-          news_topic = doc["message"]["topic"];
-          news_line1 = doc["message"]["line1"];
-          news_line2 = doc["message"]["line2"];
-          news_line3 = doc["message"]["line3"];
+          news_topic = doc["topic"];
+          news_line1 = doc["line1"];
+          news_line2 = doc["line2"];
+          news_line3 = doc["line3"];
+          */
+          news_date = doc["Datum"];
+          news_topic = doc["Message"]["Topic"];
+          news_line1 = doc["Message"]["Zeile1"];
+          news_line2 = doc["Message"]["Zeile2"];
+          news_line3 = doc["Message"]["Zeile3"];
           if(strlen(news_topic) > 9) news_date = "";  // wenn das TOIPC mehr als 9 Zeichen hat, wird das Datum nicht ausgegeben...
         }
       } 
@@ -316,7 +352,26 @@ void loop()
         oled.drawStr(0,50, news_line3);
         oled.sendBuffer();
         #endif
-
+        #ifdef DISPLAY_EPAPER29
+        display.firstPage();
+        do
+        {
+        display.fillScreen(GxEPD_WHITE);
+        display.setCursor(10, 15);
+        display.setFont(&FreeMonoBold9pt7b);
+        display.print(news_topic);
+        display.setCursor(120,15);
+        display.print(news_date);
+        display.setCursor(10, 45);
+        display.setFont(&FreeMono9pt7b);
+        display.print(news_line1);
+        display.setCursor(10, 65);
+        display.print(news_line2);
+        display.setCursor(10, 85);
+        display.print(news_line3);
+        }
+        while (display.nextPage());
+        #endif 
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
         
         digitalWrite(LED_PIN, HIGH); // Schalte LED ein

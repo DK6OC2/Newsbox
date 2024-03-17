@@ -18,10 +18,10 @@ const char* Locator = "JO31kd"; // eigener Locator
 //Hardware configuration, jeweils eine Alternative wählen
 
 //Display-Typ 
-#define DISPLAY_2004
+//#define DISPLAY_2004
 //#define DISPLAY_OLED13
 //#define DISPLAY_OLED096
-
+#define DISPLAY_EPAPER29
 //Buzzer-Typ
 #define BUZZER_PASSIVE
 //#define BUZZER_ACTIVE
