@@ -13,39 +13,56 @@
 
 WiFiMulti wifiMulti;
 
+// Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
+boolean __DEBUG = true; 
+
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 20000;
 
 #ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
-#include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x27, 20, 4);                 
-const int DISPLAY_WIDTH = 20; // Definition fürs Display, wäre das so richtig?
+  #include <LiquidCrystal_I2C.h>
+  LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 #endif
 #if defined (DISPLAY_OLED096) || defined (DISPLAY_OLED13) // für 0,96 oder 1,3" OLEDS
-#include "U8g2lib.h"
-U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
+ #include "U8g2lib.h"
+ U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 #endif
-byte mac[6];   // byte-array für Mac-Adresse
+#if defined (DISPLAY_OLED096_SSD1306)
+  #include "U8g2lib.h"
+  U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, I2C_SDA, I2C_SCL);
+#endif
+
+byte mac[6];   // byte-array for Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
-//Variablen für Nachricht
+//variables for message 
 long news_id;
-const char* news_datum;
+const char* news_date;
 const char* news_topic;
-const char* news_zeile1;
-const char* news_zeile2;
-const char* news_zeile3;
+const char* news_line1;
+const char* news_line2;
+const char* news_line3;
 long old_id; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
+
 String MacAddr;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
+
+/* PIN Settings für az-delivery-devkit-v4 */
+//int LED_PIN = 2; //Anschluss für LED
+//int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
+//int BUZZER_PIN = 5; //Anschluss für Buzzer
+
+/* PIN Settings für lolin32oled */
 int LED_PIN = 2; //Anschluss für LED
-int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
-int buzzer_pin = 5; //Anschluss für Buzzer
+int BUTTON_PIN = 15; //Anschluss für Bestätigungstaste
+int BUZZER_PIN = 14; //Anschluss für Buzzer
+
 int B_lastState = LOW;  // the previous state from the input pin
 int B_currentState;     // the current reading from the input pin
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
+
 WiFiClientSecure *client = new WiFiClientSecure ; // initialisieren des WifiClients mit SSL
 bool new_wifi = true ; // Flag für neue Wifi-Verbindung nach Verbindungsverlust
 
@@ -58,21 +75,75 @@ void setup()
 
   // LCD
   #ifdef DISPLAY_2004
-  lcd.init();
+  lcd.init(I2C_SDA, I2C_SCL);
   lcd.backlight();
   #endif
   #ifdef DISPLAY_OLED096
-  oled.begin();
-  oled.clearBuffer();
-  oled.setFont(u8g2_font_resoledbold_tr);
+    oled.begin();
+    oled.clearBuffer();
+    oled.setFont(u8g2_font_resoledbold_tr);
   #endif
   #ifdef DISPLAY_OLED13
-  oled.begin();
-  oled.clearBuffer();
-  oled.setFont(u8g2_font_6x13_tr);
+    oled.begin();
+    oled.clearBuffer();
+    oled.setFont(u8g2_font_6x13_tr);
+  #endif
+  #ifdef DISPLAY_OLED096_SSD1306
+    oled.begin();
+    oled.clearBuffer();
+    oled.setFont(u8g2_font_profont12_mf);
   #endif
 
   WiFi.mode(WIFI_STA);
+  WiFi.macAddress(mac);
+  MacAddr += String(mac[5],HEX);
+  MacAddr += String(mac[4],HEX);
+  MacAddr += String(mac[3],HEX);
+  MacAddr += String(mac[2],HEX);
+  MacAddr += String(mac[1],HEX);
+  MacAddr += String(mac[0],HEX);
+  if (__DEBUG) Serial.println("MAC: "+MacAddr);
+
+  #ifdef DISPLAY_2004
+  lcd.setCursor(0, 0);
+  lcd.print("Newsbox-Projekt");
+  lcd.setCursor(0,1);
+  lcd.print(Rufzeichen);
+  lcd.setCursor(10, 1);
+  lcd.print(Locator);
+  lcd.setCursor(0, 2);
+  lcd.print("Mac: "+MacAddr);
+  #endif
+  #ifdef DISPLAY_OLED096
+  oled.drawStr(0,15, "Newsbox-Projekt");
+  oled.drawStr(0,30, Rufzeichen);
+  oled.drawStr(70,30, Locator);
+  oled.drawStr(0,40, "Mac: ");
+  oled.drawStr(25,40, MacAddr.c_str());
+  oled.sendBuffer();
+  #endif
+  #ifdef DISPLAY_OLED13
+  oled.drawStr(2,15, "Newsbox-Projekt");
+  oled.drawStr(2,36, Rufzeichen);
+  oled.drawStr(70,36, Locator);
+  oled.drawStr(2,50, "Mac: ");
+  oled.drawStr(27,50, MacAddr.c_str());
+  oled.sendBuffer();
+  #endif
+  #ifdef DISPLAY_OLED096_SSD1306
+    oled.drawStr(0,15, "Newsbox-Projekt");
+    oled.drawStr(0,30, Rufzeichen);
+    oled.drawStr(70,30, Locator);
+    oled.drawStr(0,40, "Mac: ");
+    oled.drawStr(25,40, MacAddr.c_str());
+    oled.sendBuffer();
+  #endif
+
+  delay(3000);
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  pinMode(BUZZER_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
   
   // Add list of wifi networks
   wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
@@ -112,45 +183,7 @@ void setup()
     Serial.println(WiFi.localIP());
     new_wifi = false;
   }
-  WiFi.macAddress(mac);
-  MacAddr += String(mac[5],HEX);
-  MacAddr += String(mac[4],HEX);
-  MacAddr += String(mac[3],HEX);
-  MacAddr += String(mac[2],HEX);
-  MacAddr += String(mac[1],HEX);
-  MacAddr += String(mac[0],HEX);
-  Serial.println("MAC: "+MacAddr);
-  #ifdef DISPLAY_2004
-  lcd.setCursor(0, 0);
-  lcd.print("Newsbox-Projekt");
-  lcd.setCursor(0,1);
-  lcd.print(Rufzeichen);
-  lcd.setCursor(10, 1);
-  lcd.print(Locator);
-  lcd.setCursor(0, 2);
-  lcd.print("Mac: "+MacAddr);
-  #endif
-  #ifdef DISPLAY_OLED096
-  oled.drawStr(0,15, "Newsbox-Projekt");
-  oled.drawStr(0,30, Rufzeichen);
-  oled.drawStr(70,30, Locator);
-  oled.drawStr(0,40, "Mac: ");
-  oled.drawStr(25,40, MacAddr.c_str());
-  oled.sendBuffer();
-  #endif
-  #ifdef DISPLAY_OLED13
-  oled.drawStr(2,15, "Newsbox-Projekt");
-  oled.drawStr(2,36, Rufzeichen);
-  oled.drawStr(70,36, Locator);
-  oled.drawStr(2,50, "Mac: ");
-  oled.drawStr(27,50, MacAddr.c_str());
-  oled.sendBuffer();
-  #endif
-  delay(3000);
-  pinMode(LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
-  pinMode(buzzer_pin, OUTPUT);
-  digitalWrite(LED_PIN, LOW);
+  
 }
 
 void loop()
@@ -162,6 +195,7 @@ void loop()
     Serial.print(WiFi.SSID());
     Serial.print(" ");
     Serial.println(WiFi.RSSI());
+    new_wifi = false;
       }
   }
   else {
@@ -174,99 +208,152 @@ void loop()
   //Nachricht holen, wenn erster Durchlauf oder Intervall abgelaufen ist
   if ((fetchmessage) && (WiFi.status() == WL_CONNECTED))
     {
-    Serial.println("Fetching ... "+URL);
-    http.begin(*client, URL+"?mac="+MacAddr+"&call="+Rufzeichen); //Verbindung zum Server aufbauen
-    http.addHeader("Content-Type", "application/x-www-form-urlencoded");
-    // Send HTTP GET request
-    int httpResponseCode = http.GET();
-
-    if (httpResponseCode > 0)
-    {
-      JSonMessage = http.getString(); // Abruf JsonObject
-      DeserializationError err = deserializeJson(doc, JSonMessage); //Parse message   
-      if (err) 
-      {
-           Serial.print(F("deserializeJson() failed with code "));
-           Serial.println(err.f_str());
-           news_id = 0;
-           news_topic = "ERROR";
-           news_zeile1 = "";
-           news_zeile2 = "Nachrichtenfehler!";
-           news_zeile3 = "Bitte warten ...";
-      }
-      else
-      {
-        news_id = doc["ID"];
-        news_datum = doc["Datum"];
-        news_topic = doc["Message"]["Topic"];
-        news_zeile1 = doc["Message"]["Zeile1"];
-        news_zeile2 = doc["Message"]["Zeile2"];
-        news_zeile3 = doc["Message"]["Zeile3"];
-      }
-    } 
-    else 
-    {
-        //Fehlermeldung für Debugzwecke
-        Serial.print("Error code: ");
-        Serial.println(httpResponseCode);
-    }
-    // Free resources
-    http.end();
-    fetchmessage = false; // Pause für den Abruf
-    startTime = millis(); // Startzeit für Abruf neusetzten auf aktuellen Stand
-    } 
-  if (news_id != old_id)  //bei neuer Nachricht auf dem Server
-     {
+      //setze Abrufsignal ('*')
       #ifdef DISPLAY_2004
-      lcd.clear();  // Display löschen für neue Nachrichte 
-      //Schreibe Nachricht aufs Display wenn 2-zeilig
-      lcd.setCursor(0, 0);
-      lcd.print(news_topic);
-      lcd.setCursor(10, 0);
-      lcd.print(news_datum);
-      lcd.setCursor(0, 1);
-      lcd.print(news_zeile1);
-      lcd.setCursor(0, 2);
-      lcd.print(news_zeile2);
-      lcd.setCursor(0, 3);
-      lcd.print(news_zeile3);
+      lcd.setCursor(0, 9);
+      lcd.print("*");
       #endif
-      #ifdef DISPLAY_OLED096
-      oled.clear();  // Display löschen für neue Nachrichte 
-      //Schreibe Nachricht aufs Display wenn 2-zeilig
-      oled.drawStr(0,15, news_topic);
-      oled.drawStr(60,15, news_datum);
-      oled.drawStr(0,30, news_zeile1);
-      oled.drawStr(0,40, news_zeile2);
-      oled.drawStr(0,50, news_zeile3);
+      #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
+      oled.drawStr(55,15, "*");
       oled.sendBuffer();
       #endif
       #ifdef DISPLAY_OLED13
-      oled.clear();  // Display löschen für neue Nachrichte 
-      //Schreibe Nachricht aufs Display wenn 2-zeilig
-      oled.drawStr(2,15, news_topic);
-      oled.drawStr(65,15, news_datum);
-      oled.drawStr(2,36, news_zeile1);
-      oled.drawStr(2,50, news_zeile2);
-      oled.drawStr(2,64, news_zeile3);
+      oled.drawStr(60,15, "*");
       oled.sendBuffer();
       #endif
-      old_id = news_id; //Sichere alte Nachricht zum Vergleich
-      digitalWrite(LED_PIN, HIGH); // Schalte LED ein
-      #ifdef BUZZER_PASSIVE
-      tone(buzzer_pin, 1000, 1000);
+      Serial.println("Fetching ... "+URL);
+      http.begin(*client, URL+"?mac="+MacAddr+"&call="+Rufzeichen+"&loc="+Locator); //Verbindung zum Server aufbauen
+      http.addHeader("Content-Type", "application/x-www-form-urlencoded");
+      // Send HTTP GET request
+      int httpResponseCode = http.GET();
+
+      if (httpResponseCode > 0)
+      {
+        JSonMessage = http.getString(); // Abruf JsonObject
+        Serial.println("Server Antwort: "+JSonMessage);
+        DeserializationError err = deserializeJson(doc, JSonMessage); //Parse message   
+        if (err) 
+        {
+            Serial.print(F("deserializeJson() failed with code: "));
+            Serial.println(err.f_str());
+            news_id = 10;
+            news_topic = "ERROR";
+            news_line1 = "";
+            news_line2 = "Nachrichtenfehler!";
+            news_line3 = "Bitte warten ...";
+        }
+        else
+        {
+          news_id = doc["ID"];
+          news_date = doc["date"];
+          news_topic = doc["message"]["topic"];
+          news_line1 = doc["message"]["line1"];
+          news_line2 = doc["message"]["line2"];
+          news_line3 = doc["message"]["line3"];
+          if(strlen(news_topic) > 9) news_date = "";  // wenn das TOIPC mehr als 9 Zeichen hat, wird das Datum nicht ausgegeben...
+        }
+      } 
+      else 
+      {
+          //Fehlermeldung für Debugzwecke
+          Serial.print("Error code: ");
+          Serial.println(httpResponseCode);
+      }
+      // Free resources
+      http.end();
+      fetchmessage = false; // Pause für den Abruf
+      startTime = millis(); // Startzeit für Abruf neusetzten auf aktuellen Stand
+    } 
+
+    if (news_id != old_id)  //bei neuer Nachricht auf dem Server
+      {
+        
+        if (__DEBUG) {
+          Serial.println(news_topic);
+          Serial.println(news_date);
+          Serial.println(news_line1);
+          Serial.println(news_line2);
+          Serial.println(news_line3);
+        }
+
+        #ifdef DISPLAY_2004
+        lcd.clear();  // Display löschen für neue Nachrichte 
+        lcd.setCursor(0, 0);
+        lcd.print(news_topic);
+        lcd.setCursor(10, 0);
+        lcd.print(news_date);
+        lcd.setCursor(0, 1);
+        lcd.print(news_line1);
+        lcd.setCursor(0, 2);
+        lcd.print(news_line2);
+        lcd.setCursor(0, 3);
+        lcd.print(news_line3);
+        #endif
+        #ifdef DISPLAY_OLED096
+        oled.clear();  // Display löschen für neue Nachrichte 
+        oled.drawStr(0,15, news_topic);
+        oled.drawStr(60,15, news_date);
+        oled.drawStr(0,30, news_line1);
+        oled.drawStr(0,40, news_line2);
+        oled.drawStr(0,50, news_line3);
+        oled.sendBuffer();
+        #endif
+        #ifdef DISPLAY_OLED13
+        oled.clear();  // Display löschen für neue Nachrichte 
+        oled.drawStr(2,15, news_topic);
+        oled.drawStr(65,15, news_date);
+        oled.drawStr(2,36, news_line1);
+        oled.drawStr(2,50, news_line2);
+        oled.drawStr(2,63, news_line3);
+        oled.sendBuffer();
+        #endif
+        #ifdef DISPLAY_OLED096_SSD1306
+        oled.clear();  // Display löschen für neue Nachrichte 
+        oled.drawStr(0,15, news_topic);
+        oled.drawStr(60,15, news_date);
+        oled.drawStr(0,30, news_line1);
+        oled.drawStr(0,40, news_line2);
+        oled.drawStr(0,50, news_line3);
+        oled.sendBuffer();
+        #endif
+
+        old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
+        
+        digitalWrite(LED_PIN, HIGH); // Schalte LED ein
+        #ifdef BUZZER_PASSIVE
+          tone(BUZZER_PIN, 1000, 1000);
+        #endif
+        #ifdef BUZZER_ACTIVE
+          digitalWrite(BUZZER_PIN, HIGH);
+          delay(1000);
+          digitalWrite(BUZZER_PIN, LOW);
+        #endif      
+        
+      }
+      else
+      {
+      //Entferne Abrufsignal ('*')
+      #ifdef DISPLAY_2004
+      lcd.setCursor(0, 9);
+      lcd.print(" ");
       #endif
-      #ifdef BUZZER_ACTIVE
-      digitalWrite(buzzer_pin, HIGH);
-      delay(1000);
-      digitalWrite(buzzer_pin, LOW);
-      #endif      
-     }
+      #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
+      oled.drawStr(55,15, " ");
+      oled.sendBuffer();
+      #endif
+      #ifdef DISPLAY_OLED13
+      oled.drawStr(60,15, " ");
+      oled.sendBuffer();
+      #endif
+      }
+    
     B_currentState = digitalRead(BUTTON_PIN);
+    
     if (B_lastState == HIGH && B_currentState == LOW)
-    digitalWrite(LED_PIN, LOW); //Schalte LED aus wenn Taste gedrückt
-    // save the the last state of the button
-    B_lastState = B_currentState;  
+      digitalWrite(LED_PIN, LOW); //Schalte LED aus wenn Taste gedrückt
+    
+    B_lastState = B_currentState; // save the the last state of the button 
+    
     if (millis() - startTime >= interval)
       {
         fetchmessage = true; //wenn Interval um, hole neue Nachricht vom Server in der nächsten loop
