@@ -14,7 +14,6 @@ try {
 	die(' - cannot connect to or open the database - ');
 }
 
-// NOW_ISO is defined at config.php (ISO8601)
 // first time setup
 if($db_version == 0) {
 	try {
@@ -27,8 +26,8 @@ if($db_version == 0) {
 				`description` TEXT,
 				`created_at` TEXT
 				);
-			INSERT INTO `topics` (name, description, created_at) VALUES ('test', 'This is a Test topic.', '".NOW_ISO."');
-			INSERT INTO `topics` (name, description, created_at) VALUES ('default', 'This is a default topic.', '".NOW_ISO."');
+			INSERT INTO `topics` (name, description, created_at) VALUES ('test', 'This is a Test topic.', datetime('now'));
+			INSERT INTO `topics` (name, description, created_at) VALUES ('default', 'This is a default topic.',datetime('now'));
 
 			CREATE TABLE IF NOT EXISTS `messages` (
 			`id` INTEGER PRIMARY KEY NOT NULL,
@@ -39,8 +38,8 @@ if($db_version == 0) {
 			`created_at` TEXT,
 			`modified_at` TEXT
 		    );
-			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
-			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '2. Zeile', '3. Zeile','".NOW_ISO."', '".NOW_ISO."');
+			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '2. Zeile', '3. Zeile',datetime('now'), datetime('now'));
+			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '2. Zeile', '3. Zeile',datetime('now'), datetime('now'));
 
 			CREATE TABLE IF NOT EXISTS `map_messages_topics` (
 				`id` INTEGER PRIMARY KEY NOT NULL,
@@ -48,8 +47,8 @@ if($db_version == 0) {
 				`id_topic` INTEGER NOT NULL,
 				`created_at` TEXT
 		    );
-			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (1,1,'".NOW_ISO."');
-			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (2,2,'".NOW_ISO."');
+			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (1,1, datetime('now'));
+			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (2,2, datetime('now'));
 
             CREATE TABLE IF NOT EXISTS `clients` (
                 `id` INTEGER PRIMARY KEY NOT NULL,
@@ -88,10 +87,10 @@ if($db_version == 0) {
 				`settings_updated` INTEGER
 			);
 			CREATE UNIQUE INDEX `settings_keys` ON settings (`settings_key`);               
-			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('install_signature', '".$install_signature."', '".NOW_UNIX."');
-			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('install_date', '".NOW_ISO."', '".NOW_UNIX."');
-			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('do_setup', '1', '".NOW_UNIX."');
-			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('passkey', '', '".NOW_UNIX."');
+			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('install_signature', '".$install_signature."', strftime('%s'));
+			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('install_date', datetime('now'), strftime('%s'));
+			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('do_setup', '1', strftime('%s'));
+			INSERT INTO `settings` (settings_key, settings_value, settings_updated) VALUES ('passkey', '', strftime('%s'));
            ");
 		$db_version = 1;
 	} catch(PDOException $e) {

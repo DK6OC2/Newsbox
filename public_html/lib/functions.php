@@ -122,11 +122,9 @@ function client_register($mac_addr) {
 
 	// if not, register
 	if (TRUE) {
-		$statement = $db->prepare('INSERT INTO clients(macaddr,passkey, lastseen,created_at) VALUES (:mac_addr, :passkey, :lastseen,:created_at)');
+		$statement = $db->prepare('INSERT INTO clients(macaddr,passkey, lastseen,created_at) VALUES (:mac_addr, :passkey, datetime("now"), datetime("now"))');
 		$statement->bindValue(':mac_addr', strtolower($mac_addr), PDO::PARAM_STR);
 		$statement->bindValue(':passkey', generate_random_string(), PDO::PARAM_STR);
-		$statement->bindValue(':lastseen', NOW_ISO, PDO::PARAM_STR);
-		$statement->bindValue(':created_at', NOW_ISO, PDO::PARAM_STR);
 		$statement->execute();
 	}
 	//return $statement->rowCount();
@@ -137,10 +135,8 @@ function client_update_lastseen($mac_addr) {
 	global $db;
 	if(empty($db)) return false;
 	if (TRUE) {
-		$statement = $db->prepare('UPDATE clients SET lastseen = '.NOW_ISO.' WHERE macaddr = ');
+		$statement = $db->prepare('UPDATE clients SET lastseen = datetime("now") WHERE macaddr = :macaddr ');
 		$statement->bindValue(':macaddr', strtolower($mac_addr), PDO::PARAM_STR);
-		
-		$statement->bindValue(':created_at', NOW_ISO, PDO::PARAM_STR);
 		$statement->execute();
 	}
 	return $statement->rowCount();
@@ -171,16 +167,15 @@ function client_get_passkey($mac_addr){
 }
 
 // MESSAGES
-function msg_insert($arr_content, $timestamp=NOW_ISO) {
+function msg_insert($arr_content) {
 	global $db;
 	if(empty($db)) return false;
 
-	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) VALUES (:line1, :line2, :line3, :validfrom, :created_at)');
+	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) VALUES (:line1, :line2, :line3, datetime(:validfrom), datetime("now"))');
 	$statement->bindValue(':line1', $arr_content['line1'], PDO::PARAM_INT);
 	$statement->bindValue(':line2', $arr_content['line2'], PDO::PARAM_STR);
     $statement->bindValue(':line3', $arr_content['line3'], PDO::PARAM_STR);
     $statement->bindValue(':validfrom', $arr_content['validfrom'], PDO::PARAM_STR);
-    $statement->bindValue(':created_at', $timestamp, PDO::PARAM_STR);
 	$statement->execute();
 
     return $db->lastInsertId();

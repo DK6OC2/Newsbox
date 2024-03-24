@@ -18,7 +18,7 @@
             'line1' => $_POST['line1'],
             'line2' => $_POST['line2'],
             'line3' => $_POST['line3'],
-            'validfrom' => empty($_POST['validfrom'])?  NOW_ISO : $_POST['validfrom']
+            'validfrom' => empty($_POST['validfrom'])?  "now" : $_POST['validfrom']
         );
 
         $new_id = msg_insert($arr_content);
@@ -88,7 +88,7 @@
                             <!-- https://www.codeply.com/p/zU0EWDmIfn -->
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="validFrom">Valid from</span>
-                                <input id="validFrom" class="form-control" type="date" />
+                                <input id="validFrom" class="form-control" type="datetime-local" />
                                 <span id="validFromSelected"></span>
                             </div>
 
