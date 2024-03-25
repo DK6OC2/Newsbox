@@ -11,6 +11,7 @@ DEFINE('DS', DIRECTORY_SEPARATOR);
 DEFINE('NL', "\n");
 DEFINE('NOW_ISO', date("c")); // ISO8601 Format
 DEFINE('NOW_UNIX', time()); // Unix timestamp (needed by cookie)
+DEFINE('NOW_DISP', date("d.m.Y")); //Date at Display
 
 /* make the path easier to read */
 $dir = dirname($_SERVER['SCRIPT_NAME']);
@@ -23,7 +24,7 @@ $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
 $install_signature = bin2hex(random_bytes(16));
 
 /* set up database */
-require_once(ROOT.DS.'lib'.DS.'database.php');
+require_once(ROOT.DS.'inc'.DS.'database.php');
 
 /* load settings_raw */
 $statement = $db->prepare('SELECT * FROM settings');
@@ -68,11 +69,12 @@ unset($dir, $uri, $path_fragments, $path);
 
 /* not registered message */
 $msg_not_registered = array(
-	'Topic'	 => 'Anmeldung',          //max 9char
-	'line1' => 'Registrierung',      //max 20char
-	'line2' => 'erfolgreich',        //max 20char
-	'line3' => 'Dein PassKey: xxxxx' //max 20char
+	'date' => NOW_DISP,
+	'topic'	=> 'Setup',          //max 9char
+	'line1' => 'registration',      //max 20char
+	'line2' => 'successful',        //max 20char
+	'line3' => 'Your PassKey: xxxxx' //max 20char
 );
 
 /* load functions */
-require_once(ROOT.DS.'lib'.DS.'functions.php');
+require_once(ROOT.DS.'inc'.DS.'functions.php');

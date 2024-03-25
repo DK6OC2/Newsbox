@@ -29,7 +29,7 @@
         }
 
     } else {
-        $error_msg = "Die erste Zeile muss einen Inhalt haben!";
+        $error_msg = "The first line must have a content!";
     }
 
 	$title_suffix = 'New Message';
@@ -63,26 +63,26 @@
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
                                 <label class="form-check-label" for="flexCheckDefault">
-                                    NewsTopic List
+                                    Fake Topic
                                 </label>
                             </div>
 
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="line1">Line 1</span>
                                 <input name="line1" type="text" maxlength="20" class="form-control"
-                                    placeholder="Erste Zeile ist pflicht" aria-label="line1" aria-describedby="line1">
+                                    placeholder="required" aria-label="line1" aria-describedby="line1">
                             </div>
 
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="line2">Line 2</span>
                                 <input name="line2" type="text" maxlength="20" class="form-control"
-                                    placeholder="2nd Line optional" aria-label="line2" aria-describedby="line2">
+                                    placeholder="optional" aria-label="line2" aria-describedby="line2">
                             </div>
 
                             <div class="input-group mb-3">
                                 <span class="input-group-text" id="line3">Line 3</span>
                                 <input name="line3" type="text" maxlength="20" class="form-control"
-                                    placeholder="3rd Line optional" aria-label="line3" aria-describedby="line3">
+                                    placeholder="optional" aria-label="line3" aria-describedby="line3">
                             </div>
 
                             <!-- https://www.codeply.com/p/zU0EWDmIfn -->

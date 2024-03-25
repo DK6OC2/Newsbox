@@ -15,7 +15,8 @@ Speicherplatz für die projektspeziefische css Dateien. Grundsätzlich verwendet
 ## /js
 Speicherplatz für JavaScript
 
-## /libs
+## /inc Folder for includes
+
 ### database.php
 Mit dieser Datei wird initial die SQLite3 Datenbank aufgebaut. Sie bietet eine einfache Versionierung, so kann später ein Update von Version x auf Version y gemacht werden. 
 Die Datenbank selbst beinhaltet die Tabellen: 
