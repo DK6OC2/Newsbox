@@ -2,7 +2,16 @@
     // See http://go.microsoft.com/fwlink/?LinkId=827846
     // for the documentation about the extensions.json format
     "recommendations": [
-        "platformio.platformio-ide"
+        "platformio.platformio-ide",
+        "ms-vscode.cpptools",
+        "mhutchie.git-graph",
+        "neilbrayfield.php-docblocker",
+        "bmewburn.vscode-intelephense-client",
+        "qwtel.sqlite-viewer",
+        "yy0931.vscode-sqlite3-editor",
+        "mtxr.sqltools-driver-sqlite",
+        "esbenp.prettier-vscode",
+        "formulahendry.auto-close-tag"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"
