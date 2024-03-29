@@ -8,6 +8,32 @@ if (!$config['logged_in']) {
   die();
 }
 
+$response = array('class' => '', 'text' => '');
+
+if (!empty($_POST['line1']) &&  !empty($_POST['validfrom'])) {
+
+  //built data array
+  $arr_content = array(
+    'line1' => $_POST['line1'],
+    'line2' => $_POST['line2'],
+    'line3' => $_POST['line3'],
+    'validfrom' => $_POST['validfrom']
+  );
+
+  // insert into db
+  $new_id = msg_insert($arr_content);
+  if ($new_id > 1) {
+    $response = array('class' => 'success', 'text' => 'New message saved with ID:' . $new_id);
+    $title_suffix = 'Messages - New entry stored';
+  } else {
+    $response = array('class' => 'danger', 'text' => 'Something went wrong!');
+    $title_suffix = 'Messages';
+  }
+} else {
+  $response = array('class' => 'warning', 'text' => 'Line 1 is required!');
+  $title_suffix = 'Messages';
+}
+
 $title_suffix = 'Message List';
 require(ROOT . DS . 'templates' . DS . 'header.inc.php');
 
@@ -28,12 +54,8 @@ require(ROOT . DS . 'templates' . DS . 'header.inc.php');
             <h5 class="card-title"></h5>
             <p class="card-text"></p>
 
-            <?php if (!empty($error_msg)) : ?>
-              <div class="alert alert-danger" role="alert"><?= $error_msg ?></div>
-            <?php endif; ?>
-
-            <?php if (!empty($success_msg)) : ?>
-              <div class="alert alert-success" role="alert"><?= $success_msg ?></div>
+            <?php if (is_array($response) && !empty($response)) : ?>
+              <div class="alert alert-<?= $response['class'] ?>" role="alert"><?= $response['text'] ?></div>
             <?php endif; ?>
 
             <form action="" method="post" enctype="multipart/form-data" id="post-new-form" data-redirect="<?= $config['url'] ?>">

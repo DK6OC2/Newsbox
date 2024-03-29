@@ -63,6 +63,7 @@ if($db_version == 0) {
 			);
             CREATE UNIQUE INDEX `macaddr` ON clients (`macaddr`);
 			CREATE UNIQUE INDEX `passkey` ON clients (`passkey`);
+			INSERT INTO `clients` (macaddr,callsign,ov,locator,passkey,lastseen,created_at) VALUES ('123456789012','DL0ABC','R00','JO31KD','ABCD',datetime('now'), datetime('now'));
 
 			CREATE TABLE IF NOT EXISTS `map_clients_topics` (
 				`id` INTEGER PRIMARY KEY NOT NULL,

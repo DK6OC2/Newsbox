@@ -8,6 +8,27 @@ if (!$config['logged_in']) {
     die();
 }
 
+
+$response = array( 'class' => '', 'text' => '');
+if (!empty($_POST['name'])) {
+
+    // built data array
+    $arr_content = array(
+      'name' => $_POST['name'],
+      'remark' => $_POST['remark']
+    );
+  
+    // insert into db
+    $new_id = topic_insert($arr_content);
+    if ($new_id > 1) {
+        $response = array( 'class' => 'success', 'text' => 'New topic saved with ID:'.$new_id);
+    } else {
+        $response = array( 'class' => 'danger', 'text' => 'Something went wrong!');
+    }
+  } else {
+        $response = array( 'class' => 'danger', 'text' => 'Topic name is required!');
+  }
+
 $title_suffix = 'Topics';
 require(ROOT . DS . 'templates' . DS . 'header.inc.php');
 
@@ -26,23 +47,19 @@ require(ROOT . DS . 'templates' . DS . 'header.inc.php');
                     </div>
                     <div class="card-body">
 
-                        <?php if (!empty($error_msg)) : ?>
-                            <div class="alert alert-danger" role="alert"><?= $error_msg ?></div>
-                        <?php endif; ?>
-
-                        <?php if (!empty($success_msg)) : ?>
-                            <div class="alert alert-success" role="alert"><?= $success_msg ?></div>
+                        <?php if ( is_array($response) && !empty($response)) : ?>
+                            <div class="alert alert-<?= $response['class'] ?>" role="alert"><?= $response['text'] ?></div>
                         <?php endif; ?>
 
                         <form action="" method="post" enctype="multipart/form-data" id="post-new-form" data-redirect="<?= $config['url'] ?>">
 
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="topic">Name</span>
-                                <input name="topic" type="text" maxlength="9" class="form-control" placeholder="required" aria-label="topic" aria-describedby="topic">
+                                <span class="input-group-text" id="name">Name</span>
+                                <input name="name" type="text" maxlength="9" class="form-control" placeholder="required" aria-label="name" aria-describedby="name">
                             </div>
 
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="topic">Remark</span>
+                                <span class="input-group-text" id="remark">Remark</span>
                                 <input name="remark" type="text" class="form-control" placeholder="" aria-label="remark" aria-describedby="remark">
                             </div>
 

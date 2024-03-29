@@ -8,11 +8,10 @@ if (!$config['logged_in']) {
   die();
 }
 
-$newmsg_saved = false;
-
 if (!empty($_POST['line1']) &&  !empty($_POST['validfrom'])) {
   $error_msg = "";
   $success_msg = "";
+  $response = array( 'class' => '', 'text' => '');
 
   //built data array
   $arr_content = array(
@@ -25,15 +24,18 @@ if (!empty($_POST['line1']) &&  !empty($_POST['validfrom'])) {
   // insert into db
   $new_id = msg_insert($arr_content);
   if ($new_id > 1) {
-    $success_msg = "New message saved with ID: " . $new_id;
+    $response = array( 'class' => 'success', 'text' => 'New message saved with ID:' . $new_id);
+    $title_suffix = 'Messages - New entry stored';
   } else {
-    $error_msg = "Something goes wrong.";
+    $response = array( 'class' => 'danger', 'text' => 'Something went wrong!');
+    $title_suffix = 'Messages';
   }
 } else {
-  $error_msg = "First line must be given!";
+    $response = array( 'class' => 'warning', 'text' => 'Line 1 is required!');
+    $title_suffix = 'Messages';
 }
 
-$title_suffix = 'New Message';
+
 require(ROOT . DS . 'templates' . DS . 'header.inc.php');
 ?>
 
