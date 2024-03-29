@@ -11,7 +11,8 @@
         "neilbrayfield.php-docblocker",
         "platformio.platformio-ide",
         "qwtel.sqlite-viewer",
-        "yy0931.vscode-sqlite3-editor"
+        "yy0931.vscode-sqlite3-editor",
+        "humy2833.ftp-simple"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"
