@@ -23,11 +23,11 @@ if($db_version == 0) {
 			CREATE TABLE IF NOT EXISTS `topics` (
 				`id` INTEGER PRIMARY KEY NOT NULL,
 				`name` TEXT NOT NULL,
-				`description` TEXT,
+				`remark` TEXT,
 				`created_at` TEXT
 				);
-			INSERT INTO `topics` (name, description, created_at) VALUES ('test', 'This is a Test topic.', datetime('now'));
-			INSERT INTO `topics` (name, description, created_at) VALUES ('default', 'This is a default topic.',datetime('now'));
+			INSERT INTO `topics` (name, remark, created_at) VALUES ('test', 'This is a Test topic.', datetime('now'));
+			INSERT INTO `topics` (name, remark, created_at) VALUES ('default', 'This is a default topic.',datetime('now'));
 
 			CREATE TABLE IF NOT EXISTS `messages` (
 			`id` INTEGER PRIMARY KEY NOT NULL,

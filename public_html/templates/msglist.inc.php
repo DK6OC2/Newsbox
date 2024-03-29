@@ -1,96 +1,113 @@
 <?php
-	if(!defined('ROOT')) die('Don\'t call this directly.');
+if (!defined('ROOT')) die('Don\'t call this directly.');
 
-	/*
-    if(!$config['logged_in']) {
-		// wrong data, kick user to login page
-		header('HTTP/1.0 401 Unauthorized');
-		header('Location: '.$config['url'].'/login');
-		die();
-	}
-    */
+if (!$config['logged_in']) {
+  // wrong data, kick user to login page
+  header('HTTP/1.0 401 Unauthorized');
+  header('Location: ' . $config['url'] . '/login');
+  die();
+}
 
-    $title_suffix = 'Message List';
-	require(ROOT.DS.'templates'.DS.'header.inc.php');
+$title_suffix = 'Message List';
+require(ROOT . DS . 'templates' . DS . 'header.inc.php');
 
 ?>
 
 <body>
-    <?php require(ROOT.DS.'templates'.DS.'nav.inc.php'); ?>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <h2>List of Messages</h2>
-            
-                <div class="accordion" id="accordionExample">
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingOne">
-                            <button class="accordion-button" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                Accordion Item #1
-                            </button>
-                        </h2>
-                        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne"
-                            data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <strong>This is the first item's accordion body.</strong> It is shown by default, until
-                                the collapse plugin adds the appropriate classes that we use to style each element.
-                                These classes control the overall appearance, as well as the showing and hiding via CSS
-                                transitions. You can modify any of this with custom CSS or overriding our default
-                                variables. It's also worth noting that just about any HTML can go within the
-                                <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingTwo">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                Accordion Item #2
-                            </button>
-                        </h2>
-                        <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo"
-                            data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <strong>This is the second item's accordion body.</strong> It is hidden by default,
-                                until the collapse plugin adds the appropriate classes that we use to style each
-                                element. These classes control the overall appearance, as well as the showing and hiding
-                                via CSS transitions. You can modify any of this with custom CSS or overriding our
-                                default variables. It's also worth noting that just about any HTML can go within the
-                                <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                        </div>
-                    </div>
-                    <div class="accordion-item">
-                        <h2 class="accordion-header" id="headingThree">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-                                Accordion Item #3
-                            </button>
-                        </h2>
-                        <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree"
-                            data-bs-parent="#accordionExample">
-                            <div class="accordion-body">
-                                <strong>This is the third item's accordion body.</strong> It is hidden by default, until
-                                the collapse plugin adds the appropriate classes that we use to style each element.
-                                These classes control the overall appearance, as well as the showing and hiding via CSS
-                                transitions. You can modify any of this with custom CSS or overriding our default
-                                variables. It's also worth noting that just about any HTML can go within the
-                                <code>.accordion-body</code>, though the transition does limit overflow.
-                            </div>
-                        </div>
-                    </div>
-                </div>
+  <?php require(ROOT . DS . 'templates' . DS . 'nav.inc.php'); ?>
 
-            </div>
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        <br>
+        <div class="card">
+          <div class="card-header">
+            Create a new message
+          </div>
+          <div class="card-body">
+            <h5 class="card-title"></h5>
+            <p class="card-text"></p>
 
+            <?php if (!empty($error_msg)) : ?>
+              <div class="alert alert-danger" role="alert"><?= $error_msg ?></div>
+            <?php endif; ?>
+
+            <?php if (!empty($success_msg)) : ?>
+              <div class="alert alert-success" role="alert"><?= $success_msg ?></div>
+            <?php endif; ?>
+
+            <form action="" method="post" enctype="multipart/form-data" id="post-new-form" data-redirect="<?= $config['url'] ?>">
+
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
+                <label class="form-check-label" for="flexCheckDefault">
+                  Fake Topic
+                </label>
+              </div>
+
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="line1">Line 1</span>
+                <input name="line1" type="text" maxlength="20" class="form-control" placeholder="required" aria-label="line1" aria-describedby="line1">
+              </div>
+
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="line2">Line 2</span>
+                <input name="line2" type="text" maxlength="20" class="form-control" placeholder="optional" aria-label="line2" aria-describedby="line2">
+              </div>
+
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="line3">Line 3</span>
+                <input name="line3" type="text" maxlength="20" class="form-control" placeholder="optional" aria-label="line3" aria-describedby="line3">
+              </div>
+
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="validfrom">Valid from</span>
+                <input name="validfrom" class="form-control" type="datetime-local">
+              </div>
+
+              <button type="submit" class="btn btn-success float-end">Save</button>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
-    <?php require(ROOT.DS.'templates'.DS.'footer.inc.php'); ?>
 
-    <script>
+    <br>
 
-    </script>
+    <div class="row">
+      <div class="col">
+        <h2>List of Messages</h2>
+        <div class="accordion" id="accordionNewsbox">
+
+          <?php foreach (msg_list() as $row) : ?>
+            <div class="accordion-item">
+              <h2 class="accordion-header" id="heading<?= $row['id'] ?>">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $row['id'] ?>" aria-expanded="true" aria-controls="collapse<?= $row['id'] ?>">
+                  #<?= $row['id'] ?> valid from: <?= $row['validfrom'] ?>
+                </button>
+              </h2>
+              <div id="collapse<?= $row['id'] ?>" class="accordion-collapse collapse show" aria-labelledby="heading<?= $row['id'] ?>" data-bs-parent="#accordionNewsbox">
+                <div class="accordion-body">
+                  <?= $row['line1'] ?><br>
+                  <?= $row['line2'] ?><br>
+                  <?= $row['line3'] ?><br>
+                  <hr>
+                  <a href="<?= $config['url_detected'] ?>/msg/delete/<?= $row['id'] ?>"><i class="bi bi-trash"></i></a> &nbsp;
+                  <a href="<?= $config['url_detected'] ?>/msg/update/<?= $row['id'] ?>"><i class="bi bi-pencil"></i></a>
+                </div>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <?php require(ROOT . DS . 'templates' . DS . 'footer.inc.php'); ?>
+
+  <script>
+
+  </script>
 
 </body>
 

@@ -39,8 +39,11 @@
 			$domain = ($host != 'localhost') ? $host : false;
 			setcookie('newsbox', '', time()-3600, '/', $domain, false);
 			unset($_COOKIE['newsbox']);
-
 			header('Location: '.$config['url']);
+			break;
+		case 'topics':
+			$template = 'Manage Topics';
+			require_once(ROOT.DS.'templates'.DS.'topics.inc.php');
 			break;
 		case 'message':
 			$mac_addr = $_GET["mac"];  // simular to  like path(1)
