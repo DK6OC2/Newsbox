@@ -12,24 +12,28 @@
 
     $newmsg_saved = false; 
 
-    if(!empty($_POST['line1'])) {
+    if( !empty($_POST['line1']) &&  !empty($_POST['validfrom'])  ) {
         $error_msg = "";
+        $success_msg = "";
+
+        //built data array
         $arr_content = array(
             'line1' => $_POST['line1'],
             'line2' => $_POST['line2'],
             'line3' => $_POST['line3'],
-            'validfrom' => empty($_POST['validfrom'])?  "now" : $_POST['validfrom']
+            'validfrom' => $_POST['validfrom']
         );
 
+        // insert into db
         $new_id = msg_insert($arr_content);
         if ($new_id > 1) {
-            $newmsg_saved = true;
+            $success_msg = "New message saved with ID: ". $new_id;
         } else {
-            $newmsg_saved = false;
+            $error_msg = "Something goes wrong.";
         }
 
     } else {
-        $error_msg = "The first line must have a content!";
+        $error_msg = "First line must be given!";
     }
 
 	$title_suffix = 'New Message';
@@ -53,8 +57,8 @@
                             <div class="alert alert-danger" role="alert"><?= $error_msg ?></div>
                         <?php endif; ?>
 
-                        <?php if($newmsg_saved): ?>
-                            <div class="alert alert-success" role="alert">New message saved with ID: <?= $new_id ?></div>
+                        <?php if(!empty($success_msg)): ?>
+                            <div class="alert alert-success" role="alert"><?= $success_msg ?></div>
                         <?php endif; ?>
 
                         <form action="" method="post" enctype="multipart/form-data" id="post-new-form"
@@ -85,13 +89,10 @@
                                     placeholder="optional" aria-label="line3" aria-describedby="line3">
                             </div>
 
-                            <!-- https://www.codeply.com/p/zU0EWDmIfn -->
                             <div class="input-group mb-3">
-                                <span class="input-group-text" id="validFrom">Valid from</span>
-                                <input id="validFrom" class="form-control" type="datetime-local" />
-                                <span id="validFromSelected"></span>
+                                <span class="input-group-text" id="validfrom">Valid from</span>
+                                <input name="validfrom" class="form-control" type="datetime-local">
                             </div>
-
 
                             <button type="submit" class="btn btn-success">Save</button>
                         </form>

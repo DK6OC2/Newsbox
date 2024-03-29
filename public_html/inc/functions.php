@@ -169,9 +169,11 @@ function client_get_passkey($mac_addr){
 // MESSAGES
 function msg_insert($arr_content) {
 	global $db;
-	if(empty($db)) return false;
+	if(empty($db)){ return false; }
+	if (!is_array($arr_content)){ return false; }
 
-	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) VALUES (:line1, :line2, :line3, datetime(:validfrom), datetime("now"))');
+	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) 
+								VALUES (:line1, :line2, :line3, datetime(:validfrom), datetime("now") )');
 	$statement->bindValue(':line1', $arr_content['line1'], PDO::PARAM_INT);
 	$statement->bindValue(':line2', $arr_content['line2'], PDO::PARAM_STR);
     $statement->bindValue(':line3', $arr_content['line3'], PDO::PARAM_STR);
