@@ -14,7 +14,6 @@
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
-//#include Display_library. //  
 
 WiFiMulti wifiMulti;
 
@@ -25,72 +24,7 @@ boolean __DEBUG = true;
 const uint32_t connectTimeoutMs = 10000;
 setup_display();
 
-/*
-#ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
-  #include <LiquidCrystal_I2C.h>
-  LiquidCrystal_I2C lcd(0x27, 20, 4);                 
-#endif
-*/
-/*
-#if defined (DISPLAY_OLED096) || defined (DISPLAY_OLED13) // für 0,96 oder 1,3" OLEDS
- #include "U8g2lib.h"
- U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
-#endif
-*/
-/*
-#if defined (DISPLAY_OLED096_SSD1306)
-  #include "U8g2lib.h"
-  U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, I2C_SDA, I2C_SCL);
-#endif
-*/
-/*
-#ifdef DISPLAY_EPAPER29
-  #include <GxEPD2_BW.h>
-  #include <Fonts/FreeMonoBold9pt7b.h>
-  #include <Fonts/FreeMono9pt7b.h>
-  GxEPD2_BW<GxEPD2_290_T94, GxEPD2_290_T94::HEIGHT> display(GxEPD2_290_T94(/*CS=D8*/ 26, /*DC=D3*/ 25, /*RST=D4*/ 33, /*BUSY=D2*/ 27)); // GDEM029T94 128x296, SSD1680
-#endif
-*/
-/*
-#ifdef DISPLAY_TFT
-  #include "TFT_eSPI.h" 
-  #include <logo/NewsBox.h>
-  #include <tft.h>
 
-  /* The product now has two screens, and the initialization code needs a small change in the new version. The LCD_MODULE_CMD_1 is used to define the
-  * switch macro. 
-  #define LCD_MODULE_CMD_1
-
-  TFT_eSPI tft = TFT_eSPI();
-  #define WAIT 1000
-  unsigned long targetTime = 0; // Used for testing draw times
-
-  #if defined(LCD_MODULE_CMD_1)
-  typedef struct {
-      uint8_t cmd;
-      uint8_t data[14];
-      uint8_t len;
-  } lcd_cmd_t;
-
-  lcd_cmd_t lcd_st7789v[] = {
-      {0x11, {0}, 0 | 0x80},
-      {0x3A, {0X05}, 1},
-      {0xB2, {0X0B, 0X0B, 0X00, 0X33, 0X33}, 5},
-      {0xB7, {0X75}, 1},
-      {0xBB, {0X28}, 1},
-      {0xC0, {0X2C}, 1},
-      {0xC2, {0X01}, 1},
-      {0xC3, {0X1F}, 1},
-      {0xC6, {0X13}, 1},
-      {0xD0, {0XA7}, 1},
-      {0xD0, {0XA4, 0XA1}, 2},
-      {0xD6, {0XA1}, 1},
-      {0xE0, {0XF0, 0X05, 0X0A, 0X06, 0X06, 0X03, 0X2B, 0X32, 0X43, 0X36, 0X11, 0X10, 0X2B, 0X32}, 14},
-      {0xE1, {0XF0, 0X08, 0X0C, 0X0B, 0X09, 0X24, 0X2B, 0X22, 0X43, 0X38, 0X15, 0X16, 0X2F, 0X37}, 14},
-  };
-  #endif
-#endif
-*/
 byte mac[6];   // byte-array for Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
@@ -108,18 +42,6 @@ String IP;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
-
-#if defined(AZ_DELIVERY_DEVKIT_V4)
-  #include <boards/az-delivery-devkit-v4.h>
-#endif
-
-#if defined(LOLIN32_OLED)
-  #include <boards/lolin32-oled.h>
-#endif
-
-#if defined(LILYGO_T_DISPLAY_S3)
-  #include <boards/lilygo-t-displays3.h>
-#endif
 
 
 
