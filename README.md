@@ -26,7 +26,7 @@
 {
     "messages": [
         {
-            "ID": 0000,
+            "id": 0000,
             "date": "30.03.2024",
             "topic": "Topic",
             "subject": "subject",
@@ -35,7 +35,7 @@
             "line3": "line3"
         },
         {
-            "ID": 1111,
+            "id": 1111,
             "date": "30.03.2024",
             "topic": "Topic",
             "subject": "subject",
