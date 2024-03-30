@@ -6,7 +6,7 @@
 **11.02.2024** die info.txt ist jetzt unter: https://newsbox.r04.afu.de abgelegt</p>
 **01.02.2024** Der Programmcode ist jetzt in der main.cpp</p>
 
-## JSon-Format (aktuelle Version)
+## JSON-Format (aktuelle Version)
 
 ```
 {
@@ -21,14 +21,17 @@
 }
 ```       
 
-## JSon-Forma (geplante Version)
+## JSON-Format (geplante Version)
 ```
 {
  "ID": 1111111,  //long int
- "date": "30.03.2024",
+ "date": "30.03.2024", // FIXME  current or of the msg
  "topic": "Topic", //9 Zeichen
+ "subject" : "subject",  // only for big displays
  "line1": "line1", //20 Zeichen
  "line2": "line2", //20 Zeichen
  "line3": "line3" //20 Zeichen
-}
+},
+{
+ "ID" .......
 ```
