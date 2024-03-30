@@ -11,9 +11,9 @@ const char* WIFI_PASSWORD4 = "herzlichwillkommen2018";                // Passwor
 const char* WIFI_SSID5 = "SSID5";                    // Name des eigenen WLAN4
 const char* WIFI_PASSWORD5 = "PW5";                // Passwort eigenes WLAN4
 
-const String URL = "https://newsbox.r04-afu.de/news.json"; //Link zum Server
-const char* Rufzeichen = "DD8AKA"; // eigenes Call
-const char* Locator = "JO40ho"; // eigener Locator
+const String URL = "https://newsbox.dl5rfk.org/test.json"; //Link zum Server
+const char* Rufzeichen = "DD1NK"; // eigenes Call
+const char* Locator = "JO31kd"; // eigener Locator
 
 //Hardware configuration, jeweils eine Alternative wählen
 
