@@ -24,14 +24,25 @@
 ## JSON-Format (geplante Version)
 ```
 {
- "ID": 1111111,  //long int
- "date": "30.03.2024", // FIXME  current or of the msg
- "topic": "Topic", //9 Zeichen
- "subject" : "subject",  // only for big displays
- "line1": "line1", //20 Zeichen
- "line2": "line2", //20 Zeichen
- "line3": "line3" //20 Zeichen
-},
-{
- "ID" .......
+    "messages": [
+        {
+            "ID": 0000,
+            "date": "30.03.2024",
+            "topic": "Topic",
+            "subject": "subject",
+            "line1": "line1",
+            "line2": "line2",
+            "line3": "line3"
+        },
+        {
+            "ID": 1111,
+            "date": "30.03.2024",
+            "topic": "Topic",
+            "subject": "subject",
+            "line1": "line1",
+            "line2": "line2",
+            "line3": "line3"
+        }, ...
+    ]
+}
 ```
