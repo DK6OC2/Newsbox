@@ -3,6 +3,9 @@
 * Newsbox-Projekt des OVV R01 und R04                                                                *
 ******************************************************************************************************
 */
+#include "Arduino.h"
+#include "FS.h"         // enable Filesystem
+#include "SPIFFS.h"     // enable SPI Flash FileSystem
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
@@ -37,6 +40,46 @@ const uint32_t connectTimeoutMs = 10000;
   #include <Fonts/FreeMono9pt7b.h>
   GxEPD2_BW<GxEPD2_290_T94, GxEPD2_290_T94::HEIGHT> display(GxEPD2_290_T94(/*CS=D8*/ 26, /*DC=D3*/ 25, /*RST=D4*/ 33, /*BUSY=D2*/ 27)); // GDEM029T94 128x296, SSD1680
 #endif
+
+#ifdef DISPLAY_TFT
+  #include "TFT_eSPI.h" 
+  #include <logo/NewsBox.h>
+  #include <tft.h>
+
+  /* The product now has two screens, and the initialization code needs a small change in the new version. The LCD_MODULE_CMD_1 is used to define the
+  * switch macro. */
+  #define LCD_MODULE_CMD_1
+
+  TFT_eSPI tft = TFT_eSPI();
+  #define WAIT 1000
+  unsigned long targetTime = 0; // Used for testing draw times
+
+  #if defined(LCD_MODULE_CMD_1)
+  typedef struct {
+      uint8_t cmd;
+      uint8_t data[14];
+      uint8_t len;
+  } lcd_cmd_t;
+
+  lcd_cmd_t lcd_st7789v[] = {
+      {0x11, {0}, 0 | 0x80},
+      {0x3A, {0X05}, 1},
+      {0xB2, {0X0B, 0X0B, 0X00, 0X33, 0X33}, 5},
+      {0xB7, {0X75}, 1},
+      {0xBB, {0X28}, 1},
+      {0xC0, {0X2C}, 1},
+      {0xC2, {0X01}, 1},
+      {0xC3, {0X1F}, 1},
+      {0xC6, {0X13}, 1},
+      {0xD0, {0XA7}, 1},
+      {0xD0, {0XA4, 0XA1}, 2},
+      {0xD6, {0XA1}, 1},
+      {0xE0, {0XF0, 0X05, 0X0A, 0X06, 0X06, 0X03, 0X2B, 0X32, 0X43, 0X36, 0X11, 0X10, 0X2B, 0X32}, 14},
+      {0xE1, {0XF0, 0X08, 0X0C, 0X0B, 0X09, 0X24, 0X2B, 0X22, 0X43, 0X38, 0X15, 0X16, 0X2F, 0X37}, 14},
+  };
+  #endif
+#endif
+
 byte mac[6];   // byte-array for Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
@@ -50,19 +93,24 @@ const char* news_line3;
 long old_id; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
 
 String MacAddr;
+String IP;
 int payload_length; // Variable für die Länge des Textes vom Server definieren
 unsigned long startTime = 0; //startpunkt für Zeitschleife
 unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 
-/* PIN Settings für az-delivery-devkit-v4 */
-//int LED_PIN = 2; //Anschluss für LED
-//int BUTTON_PIN = 4; //Anschluss für Bestätigungstaste
-//int BUZZER_PIN = 5; //Anschluss für Buzzer
+#if defined(AZ_DELIVERY_DEVKIT_V4)
+  #include <boards/az-delivery-devkit-v4.h>
+#endif
 
-/* PIN Settings für lolin32oled */
-int LED_PIN = 2; //Anschluss für LED
-int BUTTON_PIN = 15; //Anschluss für Bestätigungstaste
-int BUZZER_PIN = 14; //Anschluss für Buzzer
+#if defined(LOLIN32_OLED)
+  #include <boards/lolin32-oled.h>
+#endif
+
+#if defined(LILYGO_T_DISPLAY_S3)
+  #include <boards/lilygo-t-displays3.h>
+#endif
+
+
 
 int B_lastState = LOW;  // the previous state from the input pin
 int B_currentState;     // the current reading from the input pin
@@ -104,6 +152,41 @@ void setup()
     display.setTextColor(GxEPD_BLACK);
     display.setFullWindow();
   #endif  
+
+  #ifdef DISPLAY_TFT
+    pinMode(PIN_POWER_ON, OUTPUT);
+    digitalWrite(PIN_POWER_ON, HIGH);
+    tft.begin();
+
+    #if defined(LCD_MODULE_CMD_1)
+        for (uint8_t i = 0; i < (sizeof(lcd_st7789v) / sizeof(lcd_cmd_t)); i++) {
+            tft.writecommand(lcd_st7789v[i].cmd);
+            for (int j = 0; j < (lcd_st7789v[i].len & 0x7f); j++) {
+                tft.writedata(lcd_st7789v[i].data[j]);
+            }
+
+            if (lcd_st7789v[i].len & 0x80) {
+                delay(120);
+            }
+        }
+    #endif
+
+    tft.setRotation(3);
+    tft.setSwapBytes(true);
+    tft.pushImage(0, 0, 320, 170, (uint16_t *)gImage_NewsBox);
+    delay(2000);
+
+    #if ESP_IDF_VERSION < ESP_IDF_VERSION_VAL(5,0,0)
+        ledcSetup(0, 2000, 8);
+        ledcAttachPin(PIN_LCD_BL, 0);
+        ledcWrite(0, 255);
+    #else
+        ledcAttach(PIN_LCD_BL, 200, 8);
+        ledcWrite(PIN_LCD_BL, 255);
+    #endif
+  #endif
+
+
   WiFi.mode(WIFI_STA);
   WiFi.macAddress(mac);
   MacAddr += String(mac[5],HEX);
@@ -115,31 +198,34 @@ void setup()
   if (__DEBUG) Serial.println("MAC: "+MacAddr);
 
   #ifdef DISPLAY_2004
-  lcd.setCursor(0, 0);
-  lcd.print("Newsbox-Projekt");
-  lcd.setCursor(0,1);
-  lcd.print(Rufzeichen);
-  lcd.setCursor(10, 1);
-  lcd.print(Locator);
-  lcd.setCursor(0, 2);
-  lcd.print("Mac: "+MacAddr);
+    lcd.setCursor(0, 0);
+    lcd.print("Newsbox-Projekt");
+    lcd.setCursor(0,1);
+    lcd.print(Rufzeichen);
+    lcd.setCursor(10, 1);
+    lcd.print(Locator);
+    lcd.setCursor(0, 2);
+    lcd.print("Mac: "+MacAddr);
   #endif
+
   #ifdef DISPLAY_OLED096
-  oled.drawStr(0,15, "Newsbox-Projekt");
-  oled.drawStr(0,30, Rufzeichen);
-  oled.drawStr(70,30, Locator);
-  oled.drawStr(0,40, "Mac: ");
-  oled.drawStr(25,40, MacAddr.c_str());
-  oled.sendBuffer();
+    oled.drawStr(0,15, "Newsbox-Projekt");
+    oled.drawStr(0,30, Rufzeichen);
+    oled.drawStr(70,30, Locator);
+    oled.drawStr(0,40, "Mac: ");
+    oled.drawStr(25,40, MacAddr.c_str());
+    oled.sendBuffer();
   #endif
+
   #ifdef DISPLAY_OLED13
-  oled.drawStr(2,15, "Newsbox-Projekt");
-  oled.drawStr(2,36, Rufzeichen);
-  oled.drawStr(70,36, Locator);
-  oled.drawStr(2,50, "Mac: ");
-  oled.drawStr(27,50, MacAddr.c_str());
-  oled.sendBuffer();
+    oled.drawStr(2,15, "Newsbox-Projekt");
+    oled.drawStr(2,36, Rufzeichen);
+    oled.drawStr(70,36, Locator);
+    oled.drawStr(2,50, "Mac: ");
+    oled.drawStr(27,50, MacAddr.c_str());
+    oled.sendBuffer();
   #endif
+
   #ifdef DISPLAY_OLED096_SSD1306
     oled.drawStr(0,15, "Newsbox-Projekt");
     oled.drawStr(0,30, Rufzeichen);
@@ -148,6 +234,7 @@ void setup()
     oled.drawStr(25,40, MacAddr.c_str());
     oled.sendBuffer();
   #endif
+
   #ifdef DISPLAY_EPAPER29
     display.fillScreen(GxEPD_WHITE);
     display.setCursor(10, 15);
@@ -164,6 +251,29 @@ void setup()
     display.print(MacAddr.c_str());
     display.display(false);
   #endif
+
+  #ifdef DISPLAY_TFT
+    tft.setTextSize(2);
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+    tft.drawString("NewsBox Projekt:", DISPLAY_START_X, DISPLAY_START_Y, 2);
+
+    tft.setTextSize(1);
+    //tft.fillScreen(TFT_BLACK);
+    tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+    tft.drawString("Callsign:", DISPLAY_START_X, DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT, 2);
+    tft.drawString(Rufzeichen,160, DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT, 2);
+    tft.drawString("Locator:", DISPLAY_START_X, DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT, 2);
+    tft.drawString(Locator,160, DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT, 2);
+    tft.drawString("MAC:", DISPLAY_START_X, DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT, 2);
+    tft.drawString(MacAddr,160, DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT, 2);
+//    int xpos = 0;
+//    xpos += tft.drawString("xyz{|}~", 0, 64, 2);
+//    tft.drawChar(127, xpos, 64, 2);
+    delay(WAIT);
+  #endif
+
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUTTON_PIN, INPUT_PULLUP);
@@ -201,18 +311,28 @@ void setup()
 
   // Connect to Wi-Fi using wifiMulti (connects to the SSID with strongest connection)
   Serial.println("Connecting Wifi...");
+  #ifdef DISPLAY_TFT
+    tft.drawString("Connecting WiFi...",DISPLAY_START_X, DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT, 2);    
+  #endif
+
   if(wifiMulti.run() == WL_CONNECTED) {
+    IP = WiFi.localIP().toString();
     Serial.println("");
     Serial.println("WiFi connected");
     Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
+    Serial.println(IP);
     new_wifi = false;
     #ifdef DISPLAY_EPAPER29
-    display.setCursor(10, 85);
-    display.print("IP: ");
-    display.setCursor(100, 85);
-    display.print(WiFi.localIP()); 
-    display.display(true); 
+      display.setCursor(10, 85);
+      display.print("IP: ");
+      display.setCursor(100, 85);
+      display.print(WiFi.localIP()); 
+      display.display(true); 
+    #endif
+
+    #ifdef DISPLAY_TFT
+      tft.drawString("WiFi connected, IP:",DISPLAY_START_X, DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT, 2);    
+      tft.drawString(IP,200, DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT, 2);  
     #endif
     delay(5000);
   }
@@ -224,11 +344,11 @@ void loop()
    if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
     if (new_wifi)
       {
-    Serial.print("WiFi connected: ");
-    Serial.print(WiFi.SSID());
-    Serial.print(" ");
-    Serial.println(WiFi.RSSI());
-    new_wifi = false;
+        Serial.print("WiFi connected: ");
+        Serial.print(WiFi.SSID());
+        Serial.print(" ");
+        Serial.println(WiFi.RSSI());
+        new_wifi = false;
       }
   }
   else {
@@ -243,22 +363,23 @@ void loop()
     {
       //setze Abrufsignal ('*')
       #ifdef DISPLAY_2004
-      lcd.setCursor(0, 9);
-      lcd.print("*");
+        lcd.setCursor(0, 9);
+        lcd.print("*");
       #endif
       #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
-      oled.drawStr(55,15, "*");
-      oled.sendBuffer();
+        oled.drawStr(55,15, "*");
+        oled.sendBuffer();
       #endif
       #ifdef DISPLAY_OLED13
-      oled.drawStr(60,15, "*");
-      oled.sendBuffer();
+        oled.drawStr(60,15, "*");
+        oled.sendBuffer();
       #endif
       #ifdef DISPLAY_EPAPER29
-      display.setCursor(110, 10);
-      display.print("*");
-      display.display(true);
+        display.setCursor(110, 10);
+        display.print("*");
+        display.display(true);
       #endif
+
       Serial.println("Fetching ... "+URL);
       http.begin(*client, URL+"?mac="+MacAddr+"&call="+Rufzeichen+"&loc="+Locator); //Verbindung zum Server aufbauen
       http.addHeader("Content-Type", "application/x-www-form-urlencoded");
@@ -311,24 +432,25 @@ void loop()
       delay(1000); //Wartezeit für Sichtbarkeit des Abrufsignals
       //Entferne Abrufsignal ('*')
       #ifdef DISPLAY_2004
-      lcd.setCursor(0, 9);
-      lcd.print(" ");
+        lcd.setCursor(0, 9);
+        lcd.print(" ");
       #endif
       #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
-      oled.drawStr(55,15, " ");
-      oled.sendBuffer();
+        oled.drawStr(55,15, " ");
+        oled.sendBuffer();
       #endif
       #ifdef DISPLAY_OLED13
-      oled.drawStr(60,15, " ");
-      oled.sendBuffer();
+        oled.drawStr(60,15, " ");
+        oled.sendBuffer();
       #endif
       #ifdef DISPLAY_EPAPER29
-      display.setCursor(110, 10);
-      display.setTextColor(GxEPD_WHITE);
-      display.print("*");
-      display.display(true);
-      display.setTextColor(GxEPD_BLACK);
+        display.setCursor(110, 10);
+        display.setTextColor(GxEPD_WHITE);
+        display.print("*");
+        display.display(true);
+        display.setTextColor(GxEPD_BLACK);
       #endif
+     
     if (news_id != old_id)  //bei neuer Nachricht auf dem Server
       {
         
@@ -341,72 +463,117 @@ void loop()
         }
 
         #ifdef DISPLAY_2004
-        lcd.clear();  // Display löschen für neue Nachrichte 
-        lcd.setCursor(0, 0);
-        lcd.print(news_topic);
-        lcd.setCursor(10, 0);
-        lcd.print(news_date);
-        lcd.setCursor(0, 1);
-        lcd.print(news_line1);
-        lcd.setCursor(0, 2);
-        lcd.print(news_line2);
-        lcd.setCursor(0, 3);
-        lcd.print(news_line3);
+          lcd.clear();  // Display löschen für neue Nachrichte 
+          lcd.setCursor(0, 0);
+          lcd.print(news_topic);
+          lcd.setCursor(10, 0);
+          lcd.print(news_date);
+          lcd.setCursor(0, 1);
+          lcd.print(news_line1);
+          lcd.setCursor(0, 2);
+          lcd.print(news_line2);
+          lcd.setCursor(0, 3);
+          lcd.print(news_line3);
         #endif
         #ifdef DISPLAY_OLED096
-        oled.clear();  // Display löschen für neue Nachrichte 
-        oled.drawStr(0,15, news_topic);
-        oled.drawStr(60,15, news_date);
-        oled.drawStr(0,30, news_line1);
-        oled.drawStr(0,40, news_line2);
-        oled.drawStr(0,50, news_line3);
-        oled.sendBuffer();
+          oled.clear();  // Display löschen für neue Nachrichte 
+          oled.drawStr(0,15, news_topic);
+          oled.drawStr(60,15, news_date);
+          oled.drawStr(0,30, news_line1);
+          oled.drawStr(0,40, news_line2);
+          oled.drawStr(0,50, news_line3);
+          oled.sendBuffer();
         #endif
         #ifdef DISPLAY_OLED13
-        oled.clear();  // Display löschen für neue Nachrichte 
-        oled.drawStr(2,15, news_topic);
-        oled.drawStr(65,15, news_date);
-        oled.drawStr(2,36, news_line1);
-        oled.drawStr(2,50, news_line2);
-        oled.drawStr(2,63, news_line3);
-        oled.sendBuffer();
+          oled.clear();  // Display löschen für neue Nachrichte 
+          oled.drawStr(2,15, news_topic);
+          oled.drawStr(65,15, news_date);
+          oled.drawStr(2,36, news_line1);
+          oled.drawStr(2,50, news_line2);
+          oled.drawStr(2,63, news_line3);
+          oled.sendBuffer();
         #endif
         #ifdef DISPLAY_OLED096_SSD1306
-        oled.clear();  // Display löschen für neue Nachrichte 
-        oled.drawStr(0,15, news_topic);
-        oled.drawStr(60,15, news_date);
-        oled.drawStr(0,30, news_line1);
-        oled.drawStr(0,40, news_line2);
-        oled.drawStr(0,50, news_line3);
-        oled.sendBuffer();
+          oled.clear();  // Display löschen für neue Nachrichte 
+          oled.drawStr(0,15, news_topic);
+          oled.drawStr(60,15, news_date);
+          oled.drawStr(0,30, news_line1);
+          oled.drawStr(0,40, news_line2);
+          oled.drawStr(0,50, news_line3);
+          oled.sendBuffer();
         #endif
         #ifdef DISPLAY_EPAPER29
-        display.fillScreen(GxEPD_WHITE);
-        display.setCursor(10, 15);
-        display.setFont(&FreeMonoBold9pt7b);
-        display.print(news_topic);
-        display.setCursor(120,15);
-        display.print(news_date);
-        display.setCursor(10, 45);
-        display.setFont(&FreeMono9pt7b);
-        display.print(news_line1);
-        display.setCursor(10, 65);
-        display.print(news_line2);
-        display.setCursor(10, 85);
-        display.print(news_line3);
-        display.display(false);
+          display.fillScreen(GxEPD_WHITE);
+          display.setCursor(10, 15);
+          display.setFont(&FreeMonoBold9pt7b);
+          display.print(news_topic);
+          display.setCursor(120,15);
+          display.print(news_date);
+          display.setCursor(10, 45);
+          display.setFont(&FreeMono9pt7b);
+          display.print(news_line1);
+          display.setCursor(10, 65);
+          display.print(news_line2);
+          display.setCursor(10, 85);
+          display.print(news_line3);
+          display.display(false);
         #endif 
+
+        #ifdef DISPLAY_TFT
+//          tft.setTextSize(1);
+          tft.fillScreen(TFT_BLACK);
+          tft.setTextColor(TFT_WHITE, TFT_BLACK);
+
+//          tft.drawString("Topic:", 0, 32, 7);
+//          tft.drawString(news_topic,160, 32, 7);
+//          tft.drawString("Date:", 0, 48, 7);
+//          tft.drawString(news_date,160, 48, 7);
+//          tft.drawString("Message:", 0, 64, 7);
+//          tft.drawString(news_line1,160, 64, 7);
+//          tft.drawString(news_line2,160, 80, 7);
+//          tft.drawString(news_line3,160, 96, 7);
+
+          tft.setCursor(0, DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT);
+          tft.setFreeFont(FMBO9);
+          tft.print("Topic:");
+
+          tft.setCursor(90,DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT);
+          tft.setFreeFont(FMO9);
+          tft.println(news_topic);
+
+          tft.setCursor(0, DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT);
+          tft.setFreeFont(FMBO9);
+          tft.print("Date::");
+          tft.setCursor(90,DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT);
+          tft.setFreeFont(FMO9);
+          tft.println(news_date);
+
+          tft.setCursor(0, DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT);
+          tft.setFreeFont(FMBO9);
+          tft.print("Message:");
+          tft.setCursor(90,DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT);
+          tft.setFreeFont(FMO9);
+          tft.println(news_line1);
+          tft.setCursor(90,DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT);
+          tft.println(news_line2);
+          tft.setCursor(90,DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT);
+          tft.println(news_line3);
+
+        #endif
+
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
         
-        digitalWrite(LED_PIN, HIGH); // Schalte LED ein
-        #ifdef BUZZER_PASSIVE
-          tone(BUZZER_PIN, 1000, 1000);
-        #endif
-        #ifdef BUZZER_ACTIVE
-          digitalWrite(BUZZER_PIN, HIGH);
-          delay(1000);
-          digitalWrite(BUZZER_PIN, LOW);
-        #endif      
+        #if defined(ENABLE_BUZZER)
+          digitalWrite(LED_PIN, HIGH); // Schalte LED ein
+          #ifdef BUZZER_PASSIVE
+            tone(BUZZER_PIN, 1000, 1000);
+          #endif
+          #ifdef BUZZER_ACTIVE
+            digitalWrite(BUZZER_PIN, HIGH);
+            delay(1000);
+            digitalWrite(BUZZER_PIN, LOW);
+          #endif    
+        #endif  
         
       }
     }
