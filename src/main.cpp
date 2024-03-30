@@ -9,10 +9,12 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
+#include <WiFiManager.h>
 #include <Wire.h>
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
+//#include Display_library. //  
 
 WiFiMulti wifiMulti;
 
@@ -21,33 +23,42 @@ boolean __DEBUG = true;
 
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 10000;
+setup_display();
 
+/*
 #ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
   #include <LiquidCrystal_I2C.h>
   LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 #endif
+*/
+/*
 #if defined (DISPLAY_OLED096) || defined (DISPLAY_OLED13) // für 0,96 oder 1,3" OLEDS
  #include "U8g2lib.h"
  U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
 #endif
+*/
+/*
 #if defined (DISPLAY_OLED096_SSD1306)
   #include "U8g2lib.h"
   U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, I2C_SDA, I2C_SCL);
 #endif
+*/
+/*
 #ifdef DISPLAY_EPAPER29
   #include <GxEPD2_BW.h>
   #include <Fonts/FreeMonoBold9pt7b.h>
   #include <Fonts/FreeMono9pt7b.h>
   GxEPD2_BW<GxEPD2_290_T94, GxEPD2_290_T94::HEIGHT> display(GxEPD2_290_T94(/*CS=D8*/ 26, /*DC=D3*/ 25, /*RST=D4*/ 33, /*BUSY=D2*/ 27)); // GDEM029T94 128x296, SSD1680
 #endif
-
+*/
+/*
 #ifdef DISPLAY_TFT
   #include "TFT_eSPI.h" 
   #include <logo/NewsBox.h>
   #include <tft.h>
 
   /* The product now has two screens, and the initialization code needs a small change in the new version. The LCD_MODULE_CMD_1 is used to define the
-  * switch macro. */
+  * switch macro. 
   #define LCD_MODULE_CMD_1
 
   TFT_eSPI tft = TFT_eSPI();
@@ -79,7 +90,7 @@ const uint32_t connectTimeoutMs = 10000;
   };
   #endif
 #endif
-
+*/
 byte mac[6];   // byte-array for Mac-Adresse
 String JSonMessage;
 JsonDocument doc; //JSON Opject
