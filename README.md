@@ -22,6 +22,7 @@
 ```       
 
 ## JSON-Format (geplante Version)
+ The JSON array contains maximal 10 messages
 ```
 {
     "messages": [
