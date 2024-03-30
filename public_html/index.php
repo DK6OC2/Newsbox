@@ -116,7 +116,7 @@ switch ($page) {
 
     break;
   case 'message':
-    $mac_addr = $_GET["mac"];  // simular to  like path(1)
+    $mac_addr = isset($_GET["mac"]) ? $_GET["mac"] : '';  // simular to  like path(1)
     require_once(ROOT . DS . 'message.php');
     break;
   default:

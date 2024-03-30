@@ -24,23 +24,26 @@ if($db_version == 0) {
 				`id` INTEGER PRIMARY KEY NOT NULL,
 				`name` TEXT NOT NULL,
 				`remark` TEXT,
-				`created_at` TEXT
+				`created_at` TEXT NOT NULL
 				);
-			INSERT INTO `topics` (name, remark, created_at) VALUES ('test', 'This is a Test topic.', datetime('now'));
-			INSERT INTO `topics` (name, remark, created_at) VALUES ('default', 'This is a default topic.',datetime('now'));
+			INSERT INTO `topics` (name, remark, created_at) VALUES ('Test', 'This is a Test topic.', datetime('now'));
+			INSERT INTO `topics` (name, remark, created_at) VALUES ('Default', 'This is a default topic.',datetime('now'));
 
 			CREATE TABLE IF NOT EXISTS `messages` (
 			`id` INTEGER PRIMARY KEY NOT NULL,
 			`topic` TEXT,
+			`subject` TEXT,
             `line1` TEXT,
             `line2` TEXT,
             `line3` TEXT,
 			`validfrom` TEXT,
 			`created_at` TEXT,
-			`modified_at` TEXT
+			`created_by` TEXT,
+			`modified_at` TEXT,
+			`modified_by` TEXT
 		    );
-			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag eins', '2. Zeile', '3. Zeile',datetime('now'), datetime('now'));
-			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag zwei', '2. Zeile', '3. Zeile',datetime('now'), datetime('now'));
+			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Test Eintrag', '2.Zeile............', '3. Zeile',datetime('now'), datetime('now'));
+			INSERT INTO `messages` (line1, line2, line3, validfrom, created_at) VALUES ('Default Eintrag', '2.Zeile...........', '3. Zeile',datetime('now'), datetime('now'));
 
 			CREATE TABLE IF NOT EXISTS `map_messages_topics` ( 
 				`id` INTEGER PRIMARY KEY NOT NULL,
@@ -49,9 +52,16 @@ if($db_version == 0) {
 				`created_at` TEXT
 		    );
 			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (1,1, datetime('now'));
-			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (2,2, datetime('now'));
+			INSERT INTO `map_messages_topics` (id_message,id_topic,created_at) VALUES (1,2, datetime('now'));
 
-            CREATE TABLE IF NOT EXISTS `clients` (
+			CREATE TABLE IF NOT EXISTS `map_clients_topics` (
+				`id` INTEGER PRIMARY KEY NOT NULL,
+				`id_client` INTEGER NOT NULL,
+				`id_topic` INTEGER NOT NULL,
+				`created_at` TEXT
+		    );
+
+			CREATE TABLE IF NOT EXISTS `clients` (
                 `id` INTEGER PRIMARY KEY NOT NULL,
                 `macaddr` TEXT UNIQUE,
                 `callsign` TEXT,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
@@ -65,12 +75,6 @@ if($db_version == 0) {
 			CREATE UNIQUE INDEX `passkey` ON clients (`passkey`);
 			INSERT INTO `clients` (macaddr,callsign,ov,locator,passkey,lastseen,created_at) VALUES ('123456789012','DL0ABC','R00','JO31KD','ABCD',datetime('now'), datetime('now'));
 
-			CREATE TABLE IF NOT EXISTS `map_clients_topics` (
-				`id` INTEGER PRIMARY KEY NOT NULL,
-				`id_client` INTEGER NOT NULL,
-				`id_topic` INTEGER NOT NULL,
-				`created_at` TEXT
-		    );
 
 			CREATE TABLE IF NOT EXISTS `admins` (
                 `id` INTEGER PRIMARY KEY NOT NULL,

@@ -5,14 +5,14 @@
         "bmewburn.vscode-intelephense-client",
         "esbenp.prettier-vscode",
         "formulahendry.auto-close-tag",
+        "humy2833.ftp-simple",
         "mhutchie.git-graph",
         "ms-vscode.cpptools",
         "mtxr.sqltools-driver-sqlite",
         "neilbrayfield.php-docblocker",
         "platformio.platformio-ide",
         "qwtel.sqlite-viewer",
-        "yy0931.vscode-sqlite3-editor",
-        "humy2833.ftp-simple"
+        "yy0931.vscode-sqlite3-editor"
     ],
     "unwantedRecommendations": [
         "ms-vscode.cpptools-extension-pack"

@@ -104,18 +104,23 @@ require(ROOT . DS . 'templates' . DS . 'header.inc.php');
           <?php foreach (msg_list() as $row) : ?>
             <div class="accordion-item">
               <h2 class="accordion-header" id="heading<?= $row['id'] ?>">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $row['id'] ?>" aria-expanded="true" aria-controls="collapse<?= $row['id'] ?>">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse<?= $row['id'] ?>" 
+                 aria-expanded="true" aria-controls=" collapse<?= $row['id'] ?>" 
+                 <?= (strtotime($row['validfrom']) < strtotime('now')) ? 'style="background-color: lightgrey;"' : '' ?>
+                 <?= (strtotime($row['validfrom']) > strtotime('now')) ? 'style="background-color: lightyellow;"' : '' ?>
+                 >
                   #<?= $row['id'] ?> valid from: <?= $row['validfrom'] ?>
                 </button>
               </h2>
-              <div id="collapse<?= $row['id'] ?>" class="accordion-collapse collapse show" aria-labelledby="heading<?= $row['id'] ?>" data-bs-parent="#accordionNewsbox">
+              <div id="collapse<?= $row['id'] ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $row['id'] ?>" data-bs-parent="#accordionNewsbox">
                 <div class="accordion-body">
-                  <?= $row['line1'] ?><br>
-                  <?= $row['line2'] ?><br>
-                  <?= $row['line3'] ?><br>
+                  <p style="font-family:monospace;">
+                    <?= $row['line1'] ?><br>
+                    <?= $row['line2'] ?><br>
+                    <?= $row['line3'] ?><br>
+                  </p>
                   <hr>
                   <a href="<?= $config['url_detected'] ?>/msg/delete/<?= $row['id'] ?>"><i class="bi bi-trash"></i></a> &nbsp;
-                  <a href="<?= $config['url_detected'] ?>/msg/update/<?= $row['id'] ?>"><i class="bi bi-pencil"></i></a>
                 </div>
               </div>
             </div>
