@@ -1,4 +1,7 @@
 <?php
+// Define variables
+$response = array('class' => '', 'text' => '');
+
 if (!defined('ROOT')) die('Don\'t call this directly.');
 
 if (!$config['logged_in']) {
@@ -8,12 +11,16 @@ if (!$config['logged_in']) {
   die();
 }
 
-$response = array('class' => '', 'text' => '');
+if (path(3) == 'delete'){
+  echo 'Delete not imlemented yet. Row:'. path(4);
+}
 
 if (!empty($_POST['line1']) &&  !empty($_POST['validfrom'])) {
 
   //built data array
   $arr_content = array(
+    'topics' => $_POST['topic'],
+    'subject' => $_POST['subject'],
     'line1' => $_POST['line1'],
     'line2' => $_POST['line2'],
     'line3' => $_POST['line3'],
@@ -59,12 +66,19 @@ require(ROOT . DS . 'templates' . DS . 'header.inc.php');
             <?php endif; ?>
 
             <form action="" method="post" enctype="multipart/form-data" id="post-new-form" data-redirect="<?= $config['url'] ?>">
-
+              
+             <?php foreach( topic_list() as $key=>$value): ?>
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                <label class="form-check-label" for="flexCheckDefault">
-                  Fake Topic
+                <input class="form-check-input" type="checkbox" name="topic" value="<?= $key; ?>" id="flexCheck_<?= $key; ?>" tooltip="(ID:<?= $key; ?>)" >
+                <label class="form-check-label" for="flexCheck_<?= $key; ?>">
+                  <?= $value['name']; ?> - <i><?= $value['remark']; ?> </i>
                 </label>
+              </div>
+              <?php endforeach; ?>
+
+              <div class="input-group mb-3">
+                <span class="input-group-text" id="line1">Subject</span>
+                <input name="subject" type="text" maxlength="40" class="form-control" placeholder="Subject Line" aria-label="subject" aria-describedby="subject">
               </div>
 
               <div class="input-group mb-3">
@@ -115,12 +129,13 @@ require(ROOT . DS . 'templates' . DS . 'header.inc.php');
               <div id="collapse<?= $row['id'] ?>" class="accordion-collapse collapse" aria-labelledby="heading<?= $row['id'] ?>" data-bs-parent="#accordionNewsbox">
                 <div class="accordion-body">
                   <p style="font-family:monospace;">
+                    <b><?= $row['subject'] ?></b><br>
                     <?= $row['line1'] ?><br>
                     <?= $row['line2'] ?><br>
                     <?= $row['line3'] ?><br>
                   </p>
                   <hr>
-                  <a href="<?= $config['url_detected'] ?>/msg/delete/<?= $row['id'] ?>"><i class="bi bi-trash"></i></a> &nbsp;
+                  <a href="<?= $config['url_detected'] ?>/messages/delete/<?= $row['id'] ?>"><i class="bi bi-trash"></i></a> &nbsp;
                 </div>
               </div>
             </div>

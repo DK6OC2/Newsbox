@@ -201,8 +201,9 @@ function msg_insert($arr_content)
 		return false;
 	}
 
-	$statement = $db->prepare('INSERT INTO messages (line1, line2, line3, validfrom, created_at ) 
-								VALUES (:line1, :line2, :line3, datetime(:validfrom), datetime("now") )');
+	$statement = $db->prepare('INSERT INTO messages (subject,line1, line2, line3, validfrom, created_at ) 
+								VALUES (:subject, :line1, :line2, :line3, datetime(:validfrom), datetime("now") )');
+	$statement->bindValue(':subject', $arr_content['subject'], PDO::PARAM_STR);
 	$statement->bindValue(':line1', $arr_content['line1'], PDO::PARAM_STR);
 	$statement->bindValue(':line2', $arr_content['line2'], PDO::PARAM_STR);
 	$statement->bindValue(':line3', $arr_content['line3'], PDO::PARAM_STR);
@@ -219,13 +220,14 @@ function msg_update($post_id, $arr_post, $timestamp = null)
 	if (!is_numeric($post_id) || $post_id <= 0) return false;
 
 	if ($timestamp !== null) {
-		$statement = $db->prepare('UPDATE messages SET line1 = :line1, line2 = :line2, line3 = :line3,	modified_at = :modified_at WHERE id = :id');
+		$statement = $db->prepare('UPDATE messages SET subject = :subject, line1 = :line1, line2 = :line2, line3 = :line3,	modified_at = :modified_at WHERE id = :id');
 		$statement->bindValue(':post_timestamp', $timestamp, PDO::PARAM_INT);
 	} else {
 		$statement = $db->prepare('UPDATE messages SET post_content = :post_content, post_edited = :post_edited WHERE id = :id');
 	}
 	$statement->bindValue(':id', $post_id, PDO::PARAM_INT);
 	$statement->bindValue(':topic', $arr_post['topic'], PDO::PARAM_STR);
+	$statement->bindValue(':subject', $arr_post['subject'], PDO::PARAM_STR);
 	$statement->bindValue(':line1', $arr_post['line1'], PDO::PARAM_STR);
 	$statement->bindValue(':line2', $arr_post['line2'], PDO::PARAM_STR);
 	$statement->bindValue(':line3', $arr_post['line3'], PDO::PARAM_STR);
@@ -240,16 +242,18 @@ function msg_select_latest()
 	global $db;
 	if (empty($db)) return false;
 
-	$statement = $db->prepare('SELECT id,topic,line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
+	$statement = $db->prepare('SELECT id,topic,subject,line1,line2,line3 FROM messages ORDER BY created_at DESC LIMIT 1');
 	$statement->execute();
 	$row = $statement->fetch(PDO::FETCH_ASSOC);
 	if (!empty($row)) {
+		$message['id'] = $row['id'];
+		$message['date'] = 'fixme';
 		$message['topic'] = $row['topic'];
+		$message['subject'] = $row['subject'];
 		$message['line1'] = $row['line1'];
 		$message['line2'] = $row['line2'];
 		$message['line3'] = $row['line3'];
-		$message_id = $row['id'];
-		return [$message, $message_id];
+		return [$message];
 	} else {
 		return false;
 	}

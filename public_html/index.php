@@ -20,13 +20,15 @@ $is_setup = (isset($settings) && !empty($settings['do_setup']) && $settings['do_
 if ($is_setup && path(0) !== 'settings') {
   // first time setup
   header('Location: ' . $config['url_detected'] . '/settings');
-  echo $config['url_detected'];
-  echo path(1);
+  //echo $config['url_detected'];
+  //echo path(1);
   die();
 }
 
+// check for login
 $config['logged_in'] = check_login();
 
+// switch page 
 $page = mb_strtolower(path(0));
 switch ($page) {
   case 'login':
@@ -50,11 +52,8 @@ switch ($page) {
     require_once(ROOT . DS . 'templates' . DS . 'topics.inc.php');
     break;
   case 'messages':
-    $template = 'New Message';
+    $template = 'Messages';
     require_once(ROOT . DS . 'templates' . DS . 'messages.inc.php');
-    break;
-  case 'msgedit':
-    $template = 'Edit Message';
     break;
   case 'settings':
     $template = 'Settings';
@@ -115,15 +114,13 @@ switch ($page) {
     }
 
     break;
-  case 'message':
-    $mac_addr = isset($_GET["mac"]) ? $_GET["mac"] : '';  // simular to  like path(1)
+  case 'msg':
     require_once(ROOT . DS . 'message.php');
     break;
   default:
     // redirect everything else to the homepage
-    if (!empty(path(0)) && path(0) != 'settings') {
-      // die(path(0) . path(1) . 'WTF');
-      header('Location: ' . $config['url']);
+    if (empty(path(0)) && path(0) != 'settings') {
+      header('Location: ' . $config['url'].'/dashboard');
       die();
     }
     echo "This is the NewsBox System";

@@ -76,8 +76,15 @@ Der PassKey wird dem Client initial angezeigt, damit er seine Box konfigurieren 
 
 ## $path
 
+
+## $config
+
+Is an array.
+
+## $settings
+
+Is an array.
+
 ## $clientStatus
 
-## array $config
-
-## array $settings
+valus are "known" and "unkown"

@@ -8,13 +8,12 @@
 			$domain = ($host != 'localhost') ? $host : false;
 			$hash = hash('sha256', $config['install_signature']);
 			setcookie('newsbox', $hash, NOW_UNIX+$config['cookie_life'], '/', $domain, false);
-
-			header('Location: '.$config['url'].DS.'msglist');
+			header('Location: '.$config['url'].DS.'dashboard');
 			die();
 		} else {
 			header('HTTP/1.0 401 Unauthorized');
-			$message = array(
-				'status' => 'error',
+			$response = array(
+				'status' => 'danger',
 				'message' => 'You entered wrong user credentials. Please try again.'
 			);
 		}
@@ -30,13 +29,13 @@
     <div class="container">
         <div class="row">
             <div class="col">
+
                 <?php if(path(1) == 'recovery'): ?>
-                <p class="message success">A recovery link has been sent to your email address. (Please also check
-                    Spam!)</p>
+                <div role="alert" class="alert alert-success">A recovery link has been sent to your email address.</div>
                 <?php endif; ?>
 
-                <?php if(isset($message['status']) && isset($message['message'])): ?>
-                <p class="message <?= $message['status'] ?>"><?= $message['message'] ?></p>
+                <?php if(isset($response['status']) && isset($response['message'])): ?>
+                <div role="alert" class="alert alert-<?= $response['status'] ?>"><?= $response['message'] ?></p>
                 <?php endif; ?>
 
                 <form action="" method="post">
@@ -59,7 +58,6 @@
         <?php require(ROOT.DS.'templates'.DS.'footer.inc.php'); ?>
 
     <script>
-
     </script>
 </body>
 </html>
