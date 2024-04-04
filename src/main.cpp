@@ -1,6 +1,7 @@
 /*
 ******************************************************************************************************
-* Newsbox-Projekt des OVV R01 und R04                                                                *
+* Newsbox-Projekt des OVV R01 und R04    *
+* Version 2.0                            *                               
 ******************************************************************************************************
 */
 #include <Arduino.h>
@@ -15,8 +16,10 @@
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
+
+//Wähle Includefile für Board und Display
 #include <boards/az-delivery-devkit-v4.h>
-#include <display_def.h>
+#include <displays/epaper29_bw.h>
 
 WiFiMulti wifiMulti;
 JsonDocument doc; //JSON Opject
