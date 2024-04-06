@@ -12,6 +12,8 @@
 #include <config.h>
 #include <ArduinoJson.h>
 
+WiFiMulti wifiMulti;
+
 // WiFi connect timeout per AP. Increase when connecting takes longer.
 const uint32_t connectTimeoutMs = 20000;
 
