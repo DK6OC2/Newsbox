@@ -17,11 +17,15 @@
 #include <config.h>
 #include <ArduinoJson.h>
 #include <EventButton.h>
-
-//Wähle Includefile für Board und Display
+#ifdef AZ_DELIVERY_DEVKIT_V4
 #include <boards/az-delivery-devkit-v4.h>
+#endif
+#ifdef DISPLAY_2004
 #include <displays/lcd2004.h>
-
+#endif
+#ifdef DISPLAY_EPAPER29BW
+#include <displays/epaper29_bw.h>
+#endif
 WiFiMulti wifiMulti;
 EventButton button1(BUTTON_PIN);
 JsonDocument doc; //JSON Opject
@@ -186,9 +190,8 @@ void loop()
           Serial.println(news_line3);
         }
 
-        display_message();
-        
         akt_news = 1;
+        display_message();
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
         #if defined(ENABLE_LED)
         digitalWrite(LED_PIN, HIGH); // Schalte LED ein

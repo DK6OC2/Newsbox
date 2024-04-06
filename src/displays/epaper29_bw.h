@@ -3,6 +3,7 @@
 #include <Fonts/FreeMonoBold9pt7b.h>
 #include <Fonts/FreeMono9pt7b.h>
 GxEPD2_BW<GxEPD2_290_T94, GxEPD2_290_T94::HEIGHT> display(GxEPD2_290_T94(/*CS=D8*/ 26, /*DC=D3*/ 25, /*RST=D4*/ 33, /*BUSY=D2*/ 27)); // GDEM029T94 128x296, SSD1680
+String list;
 void init_display()
 {
   display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
@@ -33,10 +34,18 @@ void display_boxdata()
 }
 void display_wifi_connecting()
 {
-   //code für connecting, wenn gewünscht
+   display.setCursor(10, 85);
+   display.setTextColor(GxEPD_BLACK);
+   display.print("Connecting to Wifi ...");
+   display.display(true); 
 }
 void display_wifi_connected()
 {
+   display.setCursor(10, 85);
+   display.setTextColor(GxEPD_WHITE);
+   display.print("Connecting to Wifi ...");
+   display.display(true);
+   display.setTextColor(GxEPD_BLACK);
    display.setCursor(10, 85);
    display.print("IP: ");
    display.setCursor(100, 85);
@@ -67,10 +76,25 @@ void display_message()
    display.print(news_date);
    display.setCursor(10, 45);
    display.setFont(&FreeMono9pt7b);
+   display.print(news_subject);
+   display.drawLine(10, 50, 250, 50, 0);
+   display.setCursor(10, 70);
    display.print(news_line1);
-   display.setCursor(10, 65);
+   display.setCursor(10, 90);
    display.print(news_line2);
-   display.setCursor(10, 85);
+   display.setCursor(10, 110);
    display.print(news_line3);
+   display.setCursor(240, 115);
+   if (akt_news == 0)
+     {
+     list = String(10);
+     }
+   else
+     {
+     list = String((akt_news));
+     }
+   list = list+"/";
+   list = list+ String(max_news);
+   display.print(list);
    display.display(false);
 }
