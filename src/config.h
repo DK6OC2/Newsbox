@@ -8,8 +8,8 @@ const char* WIFI_SSID3 = "LuP-Public";                    // Name des eigenen WL
 const char* WIFI_PASSWORD3 = "1-DASistdashausvomNikolaus-1";                // Passwort eigenes WLAN3
 const char* WIFI_SSID4 = "Homenet_Gast";                    // Name des eigenen WLAN4
 const char* WIFI_PASSWORD4 = "herzlichwillkommen2018";                // Passwort eigenes WLAN4
-const char* WIFI_SSID5 = "SSID5";                    // Name des eigenen WLAN4
-const char* WIFI_PASSWORD5 = "PW5";                // Passwort eigenes WLAN4
+const char* WIFI_SSID5 = "DL0DX";                    // Name des eigenen WLAN4
+const char* WIFI_PASSWORD5 = "r01-jo31jf";                // Passwort eigenes WLAN4
 
 const String URL = "https://newsbox.dl5rfk.org/test.json"; //Link zum Server
 const char* Rufzeichen = "DD1NK"; // eigenes Call

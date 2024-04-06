@@ -19,7 +19,7 @@
 
 //Wähle Includefile für Board und Display
 #include <boards/az-delivery-devkit-v4.h>
-#include <displays/epaper29_bw.h>
+#include <displays/lcd2004.h>
 
 WiFiMulti wifiMulti;
 JsonDocument doc; //JSON Opject
