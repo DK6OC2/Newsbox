@@ -1,5 +1,6 @@
 //general display setup
 #include <LiquidCrystal_I2C.h>
+#include <GxEPD2_BW.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 void init_display()
 {
@@ -25,23 +26,27 @@ void display_boxdata()
 }
 void display_wifi_connecting()
 {
-   //code für connecting, wenn gewünscht
+  //code für connecting, wenn gewünscht 
+  lcd.setCursor(0, 3);
+  lcd.print("Connecting to Wifi..");
 }
 void display_wifi_connected()
 {
-   //code für die Anzeige der IP-Adresse nach Verbindung zum WLAN
+  //code für die Anzeige der IP-Adresse nach Verbindung zum WLAN
+  lcd.setCursor(0, 3);
+  lcd.print("IP: "+IP+"  ");
    
 }
 void display_fetch_flag()
 {
    //code für Abrufsignal
-   lcd.setCursor(0, 9); 
+   lcd.setCursor(9, 0); 
    lcd.print("*");
 }
 void remove_fetch_flag()
 {
    //code für Entfernung des Abrufsignals
-   lcd.setCursor(0, 9);
+   lcd.setCursor(9, 0);
    lcd.print(" ");
 }
 void display_message()
