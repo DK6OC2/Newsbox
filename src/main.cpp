@@ -94,6 +94,7 @@ void setup()
   // Connect to Wi-Fi using wifiMulti (connects to the SSID with strongest connection)
   Serial.println("Connecting Wifi...");
   display_wifi_connecting();
+  delay(500);
   
   if(wifiMulti.run() == WL_CONNECTED) {
     IP = WiFi.localIP().toString();
@@ -103,7 +104,7 @@ void setup()
     Serial.println(IP);
     new_wifi = false;
     display_wifi_connected();
-    delay(5000);
+    delay(2000);
   }
   
 }

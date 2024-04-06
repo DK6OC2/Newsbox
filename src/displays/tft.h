@@ -1,31 +1,12 @@
-/*
-#ifdef DISPLAY_2004   // für 4 Zeilen/20 Zeichen Displays
-  #include <LiquidCrystal_I2C.h>
-  LiquidCrystal_I2C lcd(0x27, 20, 4);                 
-#endif
-*/
-/*
-#if defined (DISPLAY_OLED096) || defined (DISPLAY_OLED13) // für 0,96 oder 1,3" OLEDS
- #include "U8g2lib.h"
- U8G2_SH1106_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE);
-#endif
-*/
+
 /*
 #if defined (DISPLAY_OLED096_SSD1306)
   #include "U8g2lib.h"
   U8G2_SSD1306_128X64_NONAME_F_HW_I2C oled(U8G2_R0, U8X8_PIN_NONE, I2C_SDA, I2C_SCL);
 #endif
-*/
-/*
-#ifdef DISPLAY_EPAPER29
-  #include <GxEPD2_BW.h>
-  #include <Fonts/FreeMonoBold9pt7b.h>
-  #include <Fonts/FreeMono9pt7b.h>
-  GxEPD2_BW<GxEPD2_290_T94, GxEPD2_290_T94::HEIGHT> display(GxEPD2_290_T94(/*CS=D8*/ 26, /*DC=D3*/ 25, /*RST=D4*/ 33, /*BUSY=D2*/ 27)); // GDEM029T94 128x296, SSD1680
-#endif
-*/
-/*
-#ifdef DISPLAY_TFT
+
+
+
   #include "TFT_eSPI.h" 
   #include <logo/NewsBox.h>
   #include <tft.h>
@@ -64,32 +45,11 @@
   #endif
 #endif
 */
- // LCD
-  #ifdef DISPLAY_2004
-  lcd.init(I2C_SDA, I2C_SCL);
-  lcd.backlight();
-  #endif
-  #ifdef DISPLAY_OLED096
-    oled.begin();
-    oled.clearBuffer();
-    oled.setFont(u8g2_font_resoledbold_tr);
-  #endif
-  #ifdef DISPLAY_OLED13
-    oled.begin();
-    oled.clearBuffer();
-    oled.setFont(u8g2_font_6x13_tr);
-  #endif
-  #ifdef DISPLAY_OLED096_SSD1306
+ #ifdef DISPLAY_OLED096_SSD1306
     oled.begin();
     oled.clearBuffer();
     oled.setFont(u8g2_font_profont12_mf);
   #endif
-  #ifdef DISPLAY_EPAPER29
-    display.init(115200, true, 2, false); // USE THIS for Waveshare boards with "clever" reset circuit, 2ms reset pulse
-    display.setRotation(3);
-    display.setTextColor(GxEPD_BLACK);
-    display.setFullWindow();
-  #endif  
 
   #ifdef DISPLAY_TFT
     pinMode(PIN_POWER_ON, OUTPUT);
@@ -123,34 +83,6 @@
         ledcWrite(PIN_LCD_BL, 255);
     #endif
   #endif
-#ifdef DISPLAY_2004
-    lcd.setCursor(0, 0);
-    lcd.print("Newsbox-Projekt");
-    lcd.setCursor(0,1);
-    lcd.print(Rufzeichen);
-    lcd.setCursor(10, 1);
-    lcd.print(Locator);
-    lcd.setCursor(0, 2);
-    lcd.print("Mac: "+MacAddr);
-  #endif
-
-  #ifdef DISPLAY_OLED096
-    oled.drawStr(0,15, "Newsbox-Projekt");
-    oled.drawStr(0,30, Rufzeichen);
-    oled.drawStr(70,30, Locator);
-    oled.drawStr(0,40, "Mac: ");
-    oled.drawStr(25,40, MacAddr.c_str());
-    oled.sendBuffer();
-  #endif
-
-  #ifdef DISPLAY_OLED13
-    oled.drawStr(2,15, "Newsbox-Projekt");
-    oled.drawStr(2,36, Rufzeichen);
-    oled.drawStr(70,36, Locator);
-    oled.drawStr(2,50, "Mac: ");
-    oled.drawStr(27,50, MacAddr.c_str());
-    oled.sendBuffer();
-  #endif
 
   #ifdef DISPLAY_OLED096_SSD1306
     oled.drawStr(0,15, "Newsbox-Projekt");
@@ -159,23 +91,6 @@
     oled.drawStr(0,40, "Mac: ");
     oled.drawStr(25,40, MacAddr.c_str());
     oled.sendBuffer();
-  #endif
-
-  #ifdef DISPLAY_EPAPER29
-    display.fillScreen(GxEPD_WHITE);
-    display.setCursor(10, 15);
-    display.setFont(&FreeMonoBold9pt7b);
-    display.print("Newsbox-Projekt");
-    display.setCursor(10, 45);
-    display.setFont(&FreeMono9pt7b);
-    display.print(Rufzeichen);
-    display.setCursor(100, 45);
-    display.print(Locator);
-    display.setCursor(10, 65);
-    display.print("Mac: ");
-    display.setCursor(100, 65);
-    display.print(MacAddr.c_str());
-    display.display(false);
   #endif
 
   #ifdef DISPLAY_TFT
@@ -207,74 +122,17 @@
       tft.drawString("WiFi connected, IP:",DISPLAY_START_X, DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT, 2);    
       tft.drawString(IP,200, DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT, 2);  
     #endif
-     #ifdef DISPLAY_2004
-        lcd.setCursor(0, 9);
-        lcd.print("*");
-      #endif
+     
       #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
         oled.drawStr(55,15, "*");
         oled.sendBuffer();
-      #endif
-      #ifdef DISPLAY_OLED13
-        oled.drawStr(60,15, "*");
-        oled.sendBuffer();
-      #endif
-      #ifdef DISPLAY_EPAPER29
-        display.setCursor(110, 10);
-        display.print("*");
-        display.display(true);
-      #endif
-    //Entferne Abrufsignal ('*')
-      #ifdef DISPLAY_2004
-        lcd.setCursor(0, 9);
-        lcd.print(" ");
       #endif
       #if defined (DISPLAY_OLED096) || defined (OLED096_SSD1306) // für 0,96 OLEDS
         oled.drawStr(55,15, " ");
         oled.sendBuffer();
       #endif
-      #ifdef DISPLAY_OLED13
-        oled.drawStr(60,15, " ");
-        oled.sendBuffer();
-      #endif
-      #ifdef DISPLAY_EPAPER29
-        display.setCursor(110, 10);
-        display.setTextColor(GxEPD_WHITE);
-        display.print("*");
-        display.display(true);
-        display.setTextColor(GxEPD_BLACK);
-      #endif
-     #ifdef DISPLAY_2004
-          lcd.clear();  // Display löschen für neue Nachrichte 
-          lcd.setCursor(0, 0);
-          lcd.print(news_topic);
-          lcd.setCursor(10, 0);
-          lcd.print(news_date);
-          lcd.setCursor(0, 1);
-          lcd.print(news_line1);
-          lcd.setCursor(0, 2);
-          lcd.print(news_line2);
-          lcd.setCursor(0, 3);
-          lcd.print(news_line3);
-        #endif
-        #ifdef DISPLAY_OLED096
-          oled.clear();  // Display löschen für neue Nachrichte 
-          oled.drawStr(0,15, news_topic);
-          oled.drawStr(60,15, news_date);
-          oled.drawStr(0,30, news_line1);
-          oled.drawStr(0,40, news_line2);
-          oled.drawStr(0,50, news_line3);
-          oled.sendBuffer();
-        #endif
-        #ifdef DISPLAY_OLED13
-          oled.clear();  // Display löschen für neue Nachrichte 
-          oled.drawStr(2,15, news_topic);
-          oled.drawStr(65,15, news_date);
-          oled.drawStr(2,36, news_line1);
-          oled.drawStr(2,50, news_line2);
-          oled.drawStr(2,63, news_line3);
-          oled.sendBuffer();
-        #endif
+      
+       
         #ifdef DISPLAY_OLED096_SSD1306
           oled.clear();  // Display löschen für neue Nachrichte 
           oled.drawStr(0,15, news_topic);
@@ -284,23 +142,6 @@
           oled.drawStr(0,50, news_line3);
           oled.sendBuffer();
         #endif
-        #ifdef DISPLAY_EPAPER29
-          display.fillScreen(GxEPD_WHITE);
-          display.setCursor(10, 15);
-          display.setFont(&FreeMonoBold9pt7b);
-          display.print(news_topic);
-          display.setCursor(120,15);
-          display.print(news_date);
-          display.setCursor(10, 45);
-          display.setFont(&FreeMono9pt7b);
-          display.print(news_line1);
-          display.setCursor(10, 65);
-          display.print(news_line2);
-          display.setCursor(10, 85);
-          display.print(news_line3);
-          display.display(false);
-        #endif 
-
         #ifdef DISPLAY_TFT
 //          tft.setTextSize(1);
           tft.fillScreen(TFT_BLACK);
