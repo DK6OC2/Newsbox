@@ -20,6 +20,3 @@ const char* Locator = "JO31kd"; // eigener Locator
 //Buzzer-Typ
 #define BUZZER_PASSIVE
 //#define BUZZER_ACTIVE
-
-
-
