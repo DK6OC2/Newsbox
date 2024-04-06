@@ -4,7 +4,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4);
 void init_display()
 {
   // code für Displayinitialisierung
-  lcd.init(I2C_SDA, I2C_SCL);
+  lcd.init();
   lcd.backlight();
 }
 void display_splash()
