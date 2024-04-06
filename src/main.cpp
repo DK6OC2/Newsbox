@@ -16,23 +16,28 @@
 #include <HTTPClient.h>
 #include <config.h>
 #include <ArduinoJson.h>
+#include <EventButton.h>
 
 //Wähle Includefile für Board und Display
 #include <boards/az-delivery-devkit-v4.h>
 #include <displays/lcd2004.h>
 
 WiFiMulti wifiMulti;
+EventButton button1(BUTTON_PIN);
 JsonDocument doc; //JSON Opject
 // Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
 boolean __DEBUG = true; 
 WiFiClientSecure *client = new WiFiClientSecure ; // initialisieren des WifiClients mit SSL
 bool new_wifi = true ; // Flag für neue Wifi-Verbindung nach Verbindungsverlust
-
+void onButton1LongPress(EventButton& eb);
+void onbutton1Clicked(EventButton& eb);
 void setup()
 {
   // Start Serial
   Serial.begin(9600);
   Serial.setTimeout(1000); // miliseconds to wait (50 mili) for USB Data. Default 1000
+  button1.setLongPressHandler(onButton1LongPress, true);
+  button1.setClickHandler(onbutton1Clicked);
   init_display();
   display_splash();
   WiFi.mode(WIFI_STA);
@@ -49,7 +54,7 @@ void setup()
   
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
-  pinMode(BUTTON_PIN, INPUT_PULLUP);
+  //pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   
@@ -144,16 +149,6 @@ void loop()
             news_line2 = "Nachrichtenfehler!";
             news_line3 = "Bitte warten ...";
         }
-        else
-        {
-          news_id = doc["messages"][0]["id"];
-          news_date = doc["messages"][0]["date"];
-          news_topic = doc["messages"][0]["topic"];
-          news_line1 = doc["messages"][0]["line1"];
-          news_line2 = doc["messages"][0]["line2"];
-          news_line3 = doc["messages"][0]["line3"];
-          if(strlen(news_topic) > 9) news_date = "";  // wenn das TOIPC mehr als 9 Zeichen hat, wird das Datum nicht ausgegeben...
-        }
       } 
       else 
       {
@@ -167,8 +162,20 @@ void loop()
       startTime = millis(); // Startzeit für Abruf neusetzten auf aktuellen Stand
       delay(1000); //Wartezeit für Sichtbarkeit des Abrufsignals
       remove_fetch_flag();
+    }
+      
+  max_news = doc["messages"].size();
+  news_id = doc["messages"][0]["id"];
+  news_date = doc["messages"][akt_news]["date"];
+  news_topic = doc["messages"][akt_news]["topic"];
+  news_subject = doc["messages"][akt_news]["subject"];
+  news_line1 = doc["messages"][akt_news]["line1"];
+  news_line2 = doc["messages"][akt_news]["line2"];
+  news_line3 = doc["messages"][akt_news]["line3"];
+  if(strlen(news_topic) > 9) news_date = "";  // wenn das TOPIC mehr als 9 Zeichen hat, wird das Datum nicht ausgegeben...
+      
   
-    if (news_id != old_id)  //bei neuer Nachricht auf dem Server
+  if (news_id != old_id)   //bei neuer Nachricht auf dem Server
       {
         
         if (__DEBUG) {
@@ -179,7 +186,9 @@ void loop()
           Serial.println(news_line3);
         }
 
-        display_message(); 
+        display_message();
+        
+        akt_news = 1;
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
         #if defined(ENABLE_LED)
         digitalWrite(LED_PIN, HIGH); // Schalte LED ein
@@ -195,19 +204,26 @@ void loop()
           #endif    
         #endif        
       }
-    }
-    B_currentState = digitalRead(BUTTON_PIN);
     
-    if (B_lastState == HIGH && B_currentState == LOW)
-      {
-       #if defined(ENABLE_LED)
-         digitalWrite(LED_PIN, LOW); //Schalte LED aus wenn Taste gedrückt
-       #endif
-      } 
-    B_lastState = B_currentState; // save the the last state of the button 
-    
+    button1.update();
     if (millis() - startTime >= interval)
       {
         fetchmessage = true; //wenn Interval um, hole neue Nachricht vom Server in der nächsten loop
       }
+}
+void onButton1LongPress(EventButton& eb) {
+   #if defined(ENABLE_LED)
+         digitalWrite(LED_PIN, LOW); //Schalte LED aus wenn Taste lange gedrückt
+   #endif
+} 
+void onbutton1Clicked(EventButton& eb) {
+  if ((akt_news + 1) < doc["messages"].size())
+    {
+      akt_news = akt_news + 1;
+    }
+  else
+    {
+      akt_news = 0;
+    }
+  display_message(); 
 }

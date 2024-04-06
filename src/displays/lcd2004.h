@@ -1,6 +1,6 @@
 //general display setup
 #include <LiquidCrystal_I2C.h>
-#include <GxEPD2_BW.h>
+//#include <GxEPD2_BW.h>
 LiquidCrystal_I2C lcd(0x27, 20, 4);                 
 void init_display()
 {
