@@ -110,10 +110,14 @@ void display_wifi_connected()
 void display_fetch_flag()
 {
    //code für Abrufsignal
+   tft.setFreeFont(FMO9);
+   tft.drawString("*",220,DISPLAY_START_Y + 8* DISPLAY_ROW_HEIGHT, 2);
 }
 void remove_fetch_flag()
 {
    //code für Entfernung des Abrufsignals
+   tft.setFreeFont(FMO9);
+   tft.drawString("  ",220,DISPLAY_START_Y + 8* DISPLAY_ROW_HEIGHT, 2);
 }
 void display_message()
 {
@@ -138,35 +142,35 @@ void display_message()
 //          tft.drawString(news_line2,160, 80, 7);
 //          tft.drawString(news_line3,160, 96, 7);
 
-          tft.setCursor(0, DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(5, DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMBO9);
           tft.print("Topic:");
 
-          tft.setCursor(90,DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(95,DISPLAY_START_Y + 2* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMO9);
           tft.println(news_topic);
 
-          tft.setCursor(0, DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(5, DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMBO9);
-          tft.print("Date::");
-          tft.setCursor(90,DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT);
+          tft.print("Date:");
+          tft.setCursor(95,DISPLAY_START_Y + 3* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMO9);
           tft.println(news_date);
-          tft.setCursor(0, DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(5, DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMBO9);
           tft.print("Subject:");
-           tft.setCursor(90,DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT);
+           tft.setCursor(95,DISPLAY_START_Y + 4* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMO9);
           tft.println(news_subject);
-          tft.setCursor(0, DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(5, DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMBO9);
           tft.print("Message:");
-          tft.setCursor(90,DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(95,DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT);
           tft.setFreeFont(FMO9);
           tft.println(news_line1);
-          tft.setCursor(90,DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(95,DISPLAY_START_Y + 6* DISPLAY_ROW_HEIGHT);
           tft.println(news_line2);
-          tft.setCursor(90,DISPLAY_START_Y + 7* DISPLAY_ROW_HEIGHT);
+          tft.setCursor(95,DISPLAY_START_Y + 7* DISPLAY_ROW_HEIGHT);
           tft.println(news_line3);
           tft.setCursor(250,DISPLAY_START_Y + 9* DISPLAY_ROW_HEIGHT);
           if (akt_news == 0)
