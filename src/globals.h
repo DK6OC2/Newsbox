@@ -17,3 +17,4 @@ unsigned long interval  = 600000 ; //Nachricht aller 10m abfragen
 int max_news; //Anzahl der Nachrichten in einem JSon-Paket
 int akt_news = 0; //aktuell angezeigte Nachricht
 bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
+bool first_run; // Workaround für Buzzer_bug beim LILIGO-t-display-s3

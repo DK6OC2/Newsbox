@@ -20,11 +20,26 @@
 #ifdef AZ_DELIVERY_DEVKIT_V4
 #include <boards/az-delivery-devkit-v4.h>
 #endif
+#ifdef LILYGO_T_DISPLAY_S3
+#include <boards/lilygo-t-displays3.h>
+#endif
 #ifdef DISPLAY_2004
 #include <displays/lcd2004.h>
 #endif
 #ifdef DISPLAY_EPAPER29BW
 #include <displays/epaper29_bw.h>
+#endif
+#ifdef DISPLAY_OLED13
+#include <displays/oled13.h>
+#endif
+#ifdef DISPLAY_OLED096
+#include <displays/oled096.h>
+#endif
+#ifdef DISPLAY_OLED096_SSD1306
+#include <displays/oled096_SSD1306.h>
+#endif
+#ifdef DISPLAY_TFT
+#include <displays/tft.h>
 #endif
 WiFiMulti wifiMulti;
 EventButton button1(BUTTON_PIN);
@@ -38,7 +53,7 @@ void onbutton1Clicked(EventButton& eb);
 void setup()
 {
   // Start Serial
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.setTimeout(1000); // miliseconds to wait (50 mili) for USB Data. Default 1000
   button1.setLongPressHandler(onButton1LongPress, true);
   button1.setClickHandler(onbutton1Clicked);
@@ -58,7 +73,6 @@ void setup()
   
   delay(3000);
   pinMode(LED_PIN, OUTPUT);
-  //pinMode(BUTTON_PIN, INPUT_PULLUP);
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   
@@ -111,7 +125,7 @@ void setup()
 
 void loop()
 {
-   if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
+  if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
     if (new_wifi)
       {
         Serial.print("WiFi connected: ");
@@ -121,7 +135,8 @@ void loop()
         new_wifi = false;
       }
   }
-  else {
+  else if (!new_wifi) 
+  {
     Serial.println("WiFi not connected!");
     new_wifi = true;
   }
@@ -168,7 +183,10 @@ void loop()
       delay(1000); //Wartezeit für Sichtbarkeit des Abrufsignals
       remove_fetch_flag();
     }
-      
+
+  if (WiFi.status() == WL_CONNECTED) 
+
+  {    
   max_news = doc["messages"].size();
   news_id = doc["messages"][0]["id"];
   news_date = doc["messages"][akt_news]["date"];
@@ -177,10 +195,9 @@ void loop()
   news_line1 = doc["messages"][akt_news]["line1"];
   news_line2 = doc["messages"][akt_news]["line2"];
   news_line3 = doc["messages"][akt_news]["line3"];
-  if(strlen(news_topic) > 9) news_date = "";  // wenn das TOPIC mehr als 9 Zeichen hat, wird das Datum nicht ausgegeben...
-      
-  
-  if (news_id != old_id)   //bei neuer Nachricht auf dem Server
+  if(strlen(news_topic) > 9) news_date = "";  // wenn das TOPIC mehr als 9 Zeichen hat, wird das Datum nicht ausgegeben...    
+  }
+  if ((news_id != old_id) && (WiFi.status() == WL_CONNECTED))   //bei bestehender WLAN-Verbindung und neuer Nachricht auf dem Server
       {
         
         if (__DEBUG) {
@@ -192,7 +209,6 @@ void loop()
         }
 
         akt_news = 1;
-        display_message();
         old_id = news_id; //Sichere alte Nachrichten-id zum Vergleich
         #if defined(ENABLE_LED)
         digitalWrite(LED_PIN, HIGH); // Schalte LED ein
@@ -206,7 +222,11 @@ void loop()
             delay(1000);
             digitalWrite(BUZZER_PIN, LOW);
           #endif    
-        #endif        
+        #endif
+        delay(500);
+        first_run = true;
+        display_message();  
+        first_run = false;      
       }
     
     button1.update();
