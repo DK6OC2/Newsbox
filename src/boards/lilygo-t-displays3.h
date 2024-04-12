@@ -1,6 +1,4 @@
 /* PIN Settings für lilygo-t-displays3 */
-
-int LED_PIN = 2; //Anschluss für LED
 int BUTTON_PIN = 14; //Anschluss für Bestätigungstaste
 int BUZZER_PIN = 1; //Anschluss für Buzzer
 

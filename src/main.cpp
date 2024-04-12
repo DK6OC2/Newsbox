@@ -5,51 +5,29 @@
 ******************************************************************************************************
 */
 #include <Arduino.h>
-#include <globals.h>
-#include <FS.h>         // enable Filesystem
-#include <SPIFFS.h>     // enable SPI Flash FileSystem
+#include <config.h>     // we need to load config settings first
+#include <globals.h>    // now we load global values
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
 //#include <WiFiManager.h>
 #include <Wire.h>
 #include <HTTPClient.h>
-#include <config.h>
 #include <ArduinoJson.h>
 #include <EventButton.h>
-#ifdef AZ_DELIVERY_DEVKIT_V4
-#include <boards/az-delivery-devkit-v4.h>
-#endif
-#ifdef LILYGO_T_DISPLAY_S3
-#include <boards/lilygo-t-displays3.h>
-#endif
-#ifdef DISPLAY_2004
-#include <displays/lcd2004.h>
-#endif
-#ifdef DISPLAY_EPAPER29BW
-#include <displays/epaper29_bw.h>
-#endif
-#ifdef DISPLAY_OLED13
-#include <displays/oled13.h>
-#endif
-#ifdef DISPLAY_OLED096
-#include <displays/oled096.h>
-#endif
-#ifdef DISPLAY_OLED096_SSD1306
-#include <displays/oled096_SSD1306.h>
-#endif
-#ifdef DISPLAY_TFT
-#include <displays/tft.h>
-#endif
+#include <ESP32Web.h>
+
+
+
 WiFiMulti wifiMulti;
 EventButton button1(BUTTON_PIN);
 JsonDocument doc; //JSON Opject
-// Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
-boolean __DEBUG = true; 
-WiFiClientSecure *client = new WiFiClientSecure ; // initialisieren des WifiClients mit SSL
-bool new_wifi = true ; // Flag für neue Wifi-Verbindung nach Verbindungsverlust
+boolean __DEBUG = true;                                 // Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
+WiFiClientSecure *client = new WiFiClientSecure ;       // initialisieren des WifiClients mit SSL
+bool new_wifi = true ;                                  // Flag für neue Wifi-Verbindung nach Verbindungsverlust
 void onButton1LongPress(EventButton& eb);
 void onbutton1Clicked(EventButton& eb);
+
 void setup()
 {
   // Start Serial
@@ -59,6 +37,19 @@ void setup()
   button1.setClickHandler(onbutton1Clicked);
   init_display();
   display_splash();
+  
+  pinMode(LED_PIN, OUTPUT);
+  digitalWrite(LED_PIN, LOW);
+
+  // Looping Functions: 
+  t0_AP_Mode.setInterval(1000, ledBlink); // timer for LED blink
+  t0_AP_Mode.setInterval(1000, stopAP); // timer for AP mode (WiFi Hostpot)
+
+   // check config file -> run AP or STA mode -> start web server
+  checkWiFiConfig();
+
+  Serial.println("Setup done");
+  
   WiFi.mode(WIFI_STA);
   WiFi.macAddress(mac);
   MacAddr += String(mac[5],HEX);
@@ -76,71 +67,15 @@ void setup()
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
   
-  // Add list of wifi networks
-  wifiMulti.addAP(WIFI_SSID1, WIFI_PASSWORD1);
-  wifiMulti.addAP(WIFI_SSID2, WIFI_PASSWORD2);
-  wifiMulti.addAP(WIFI_SSID3, WIFI_PASSWORD3);
-  wifiMulti.addAP(WIFI_SSID4, WIFI_PASSWORD4);
-  wifiMulti.addAP(WIFI_SSID5, WIFI_PASSWORD5);
-
- // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  if (n == 0) {
-      Serial.println("no networks found");
-  } 
-  else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    for (int i = 0; i < n; ++i) {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN)?" ":"*");
-      delay(10);
-    }
-  }
-
-  // Connect to Wi-Fi using wifiMulti (connects to the SSID with strongest connection)
-  Serial.println("Connecting Wifi...");
-  display_wifi_connecting();
-  delay(500);
-  
-  if(wifiMulti.run() == WL_CONNECTED) {
-    IP = WiFi.localIP().toString();
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
-    Serial.println(IP);
-    new_wifi = false;
-    display_wifi_connected();
-    delay(2000);
-  }
-  
 }
 
 void loop()
 {
-  if (wifiMulti.run(connectTimeoutMs) == WL_CONNECTED) {
-    if (new_wifi)
-      {
-        Serial.print("WiFi connected: ");
-        Serial.print(WiFi.SSID());
-        Serial.print(" ");
-        Serial.println(WiFi.RSSI());
-        new_wifi = false;
-      }
-  }
-  else if (!new_wifi) 
-  {
-    Serial.println("WiFi not connected!");
-    new_wifi = true;
-  }
+  handleState(); // handle the state of the web server (AP or STA)
+
   client->setInsecure(); // ignoriere SSL-Cert
+
+
   
   HTTPClient http ; //Webclient starten
   //Nachricht holen, wenn erster Durchlauf oder Intervall abgelaufen ist
@@ -230,7 +165,7 @@ void loop()
       }
     
     button1.update();
-    if (millis() - startTime >= interval)
+    if (millis() - startTime >= readNewsInterval)
       {
         fetchmessage = true; //wenn Interval um, hole neue Nachricht vom Server in der nächsten loop
       }
