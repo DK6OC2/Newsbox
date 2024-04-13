@@ -8,18 +8,18 @@ const char* news_line3;
 const uint32_t connectTimeoutMs = 10000;
 String MacAddr;
 String IP;
-byte mac[6];   // byte-array for Mac-Adresse
+byte mac[6];                                                  // byte-array for Mac-Adresse
 String JSonMessage;
-long old_id = 999999; // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
-int payload_length; // Variable für die Länge des Textes vom Server definieren
-unsigned long startTime = 0; //startpunkt für Zeitschleife
-unsigned long readNewsInterval  = 600000 ; //Nachricht aller 10m abfragen
-int max_news; //Anzahl der Nachrichten in einem JSon-Paket
-int akt_news = 0; //aktuell angezeigte Nachricht
-bool fetchmessage = true ; // Flag für Zeitschleife des Nachrichtenabrufs
-bool first_run; // Workaround für Buzzer_bug beim LILIGO-t-display-s3
-// extern const int LED_PIN; // Global Definition for LED_PIN
-const int LED_PIN = 2; //Anschluss für LED
+long old_id = 999999;                                         // Variable für Änderungsprüfung, muss beim ersten Durchlauf abweichen
+int payload_length;                                           // Variable für die Länge des Textes vom Server definieren
+unsigned long startTime = 0;                                  // startpunkt für Zeitschleife
+unsigned long readNewsInterval  = 600000 ;                    // Nachricht aller 10m abfragen
+int max_news;                                                 // Anzahl der Nachrichten in einem JSon-Paket
+int akt_news = 0;                                             // aktuell angezeigte Nachricht
+bool fetchmessage = true ;                                    // Flag für Zeitschleife des Nachrichtenabrufs
+bool first_run;                                               // Workaround für Buzzer_bug beim LILIGO-t-display-s3
+const int LED_PIN = 2;                                        // Anschluss für LED
+const boolean __DEBUG = true;                                 // Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
 
 /* Board/Display specific includes, defined in PlatformIO.ini */
 #ifdef AZ_DELIVERY_DEVKIT_V4

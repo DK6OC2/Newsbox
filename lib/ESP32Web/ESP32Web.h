@@ -42,7 +42,7 @@ extern unsigned long interval;
 // AP timer: variables used in startAP() & stopAP()
 extern unsigned long apStartTime;
 extern unsigned long apDuration;
-
+extern unsigned long checkWifiTime; 
 extern unsigned long apTimerRemaining;
 
 // AsyncWebServer server(80);

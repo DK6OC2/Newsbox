@@ -22,7 +22,6 @@
 WiFiMulti wifiMulti;
 EventButton button1(BUTTON_PIN);
 JsonDocument doc; //JSON Opject
-boolean __DEBUG = true;                                 // Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
 WiFiClientSecure *client = new WiFiClientSecure ;       // initialisieren des WifiClients mit SSL
 bool new_wifi = true ;                                  // Flag für neue Wifi-Verbindung nach Verbindungsverlust
 void onButton1LongPress(EventButton& eb);
@@ -50,7 +49,7 @@ void setup()
 
   Serial.println("Setup done");
   
-  WiFi.mode(WIFI_STA);
+  //WiFi.mode(WIFI_STA);
   WiFi.macAddress(mac);
   MacAddr += String(mac[5],HEX);
   MacAddr += String(mac[4],HEX);

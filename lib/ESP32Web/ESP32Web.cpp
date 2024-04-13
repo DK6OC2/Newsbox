@@ -14,7 +14,8 @@ const char* ap_ssid = "afu-newsbox"; // Hotspot WiFi Name
 const char* ap_password = "AFU-NewsBox"; // Hotspot WiFi Password
 // How long WiFi Hotspot stays open for 
 // -- Hotspot is energy consuming & chip can get hot
-unsigned long apDuration = 200000; // 3 mins = 180000, 2 mins = 120000, 1 min = 60000
+unsigned long apDuration = 300000; // 3 mins = 180000, 2 mins = 120000, 1 min = 60000
+unsigned long checkWifiTime = 30000; // 10000 = 10 sec, 20000 = 20 sec, 30000 = 30 sec
 bool captiveWebPortal = true; // Would you like to show a captive portal to the user? (true or false)
 
 // Local Website URL
@@ -33,7 +34,7 @@ int wifiNum = -1;                // number of networks
 String wifi_array[20] = {}; // all netwrks in object
 
 unsigned long previousMillis = 0;
-unsigned long interval = 10000;
+unsigned long interval = 30000;
 
 
 // AP timer: How long access points stays open for
@@ -414,8 +415,8 @@ void handlePostRequest(AsyncWebServerRequest* request, uint8_t* data, size_t len
       JsonDocument wifi_doc;
 
       // Add key-value pairs to json object
-      wifi_doc["ssid"] = "Hyperoptic Fibre 4AF7";
-      wifi_doc["password"] = "ETVYEQP?";
+      wifi_doc["ssid"] = ap_ssid;
+      wifi_doc["password"] = ap_password;
 
       // Convert the JSON object to a string
       String wifi_jsonString;
@@ -464,10 +465,10 @@ void handlePostRequest(AsyncWebServerRequest* request, uint8_t* data, size_t len
 void startWiFi() {
 
    Serial.println(ssid);
-   Serial.println(password);
+   Serial.println("******************");
 
    ssid_connected = ssid;
-   Serial.print("ssid_connected: ");
+   Serial.print("NewsBox is going to connect to: ");
    Serial.println(ssid_connected);
 
    WiFi.mode(WIFI_STA);
@@ -481,7 +482,7 @@ void startWiFi() {
       delay(1000);
 
       // Check if connection attempt timed out (20 sec)
-      if (millis() - startAttemptTime > 10000) {
+      if (millis() - startAttemptTime > checkWifiTime) {
          Serial.println("\nFailed to connect to WiFi. Check credentials or move closer to the access point.");
          setupWiFi();
          return;
@@ -538,6 +539,7 @@ void startAP() {
    WiFi.softAP(ap_ssid, ap_password);
    Serial.println("softap");
    Serial.println("");
+   Serial.print("IP: ");
    Serial.println(WiFi.softAPIP()); // prints ip address
 
    // To send to the react website for correct component rendering
@@ -756,7 +758,7 @@ void checkWiFiConfig() {
 
 
 
-void ledBlink() {    // LED_PIN must be assigne somehow globally
+void ledBlink() {    // LED_PIN must be assigned somehow globally
    int _LED_PIN = 2;
    digitalWrite(_LED_PIN, !digitalRead(_LED_PIN));
 

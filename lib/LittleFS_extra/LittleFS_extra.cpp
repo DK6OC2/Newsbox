@@ -95,14 +95,16 @@ void readFile(fs::FS& fs, const char* path)
     return;
   }
 
-  Serial.println("- read from file:");
-  while (file.available())
-  {
-    Serial.write(file.read());
-  }
-  Serial.println("");
-  Serial.println("==============");
-  file.close();
+  /* removed to hide password, DD8AKA */
+    Serial.println("- read from file:");
+    while (file.available())
+    {
+      Serial.write(file.read());
+    }
+    Serial.println("");
+    Serial.println("==============");
+    file.close();
+  //*/
 }
 
 void writeFile(fs::FS& fs, const char* path, const char* message)
