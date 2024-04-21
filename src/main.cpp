@@ -10,7 +10,6 @@
 #include <WiFi.h>
 #include <WiFiMulti.h>
 #include <WiFiClientSecure.h>
-//#include <WiFiManager.h>
 #include <Wire.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
@@ -60,12 +59,13 @@ void setup()
   if (__DEBUG) Serial.println("MAC: "+MacAddr);
 
   display_boxdata();
-  
-  delay(3000);
+  IP = WiFi.localIP().toString();
+  display_wifi_connected();
+
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
   digitalWrite(LED_PIN, LOW);
-  
+  delay(3000);
 }
 
 void loop()

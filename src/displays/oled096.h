@@ -24,10 +24,7 @@ void display_boxdata()
   oled.drawStr(25,40, MacAddr.c_str());
   oled.sendBuffer();
 }
-void display_wifi_connecting()
-{
-   //code für connecting, wenn gewünscht
-}
+
 void display_wifi_connected()
 {
    //code für die Anzeige der IP-Adresse nach Verbindung zum WLAN

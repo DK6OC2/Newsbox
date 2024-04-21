@@ -32,24 +32,14 @@ void display_boxdata()
     display.print(MacAddr.c_str());
     display.display(false);
 }
-void display_wifi_connecting()
-{
-   display.setCursor(10, 85);
-   display.setTextColor(GxEPD_BLACK);
-   display.print("Connecting to Wifi ...");
-   display.display(true); 
-}
+
 void display_wifi_connected()
 {
-   display.setCursor(10, 85);
-   display.setTextColor(GxEPD_WHITE);
-   display.print("Connecting to Wifi ...");
-   display.display(true);
    display.setTextColor(GxEPD_BLACK);
    display.setCursor(10, 85);
    display.print("IP: ");
    display.setCursor(100, 85);
-   display.print(WiFi.localIP()); 
+   display.print(IP); 
    display.display(true); 
 }
 void display_fetch_flag()

@@ -17,8 +17,7 @@ unsigned long readNewsInterval  = 600000 ;                    // Nachricht aller
 int max_news;                                                 // Anzahl der Nachrichten in einem JSon-Paket
 int akt_news = 0;                                             // aktuell angezeigte Nachricht
 bool fetchmessage = true ;                                    // Flag für Zeitschleife des Nachrichtenabrufs
-bool first_run;                                               // Workaround für Buzzer_bug beim LILIGO-t-display-s3
-const int LED_PIN = 2;                                        // Anschluss für LED
+bool first_run;                                               // Workaround für Buzzer_bug beim LILIGO-t-display-s3                                     
 const boolean __DEBUG = true;                                 // Debug Switch - auf true um Ausgaben auf die Konsole zu bekommen
 
 /* Board/Display specific includes, defined in PlatformIO.ini */

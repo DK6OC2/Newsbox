@@ -95,11 +95,7 @@ void display_boxdata()
 //    tft.drawChar(127, xpos, 64, 2);
     delay(WAIT);
 }
-void display_wifi_connecting()
-{
-   //code für connecting, wenn gewünscht
-    tft.drawString("Connecting WiFi...",DISPLAY_START_X, DISPLAY_START_Y + 5* DISPLAY_ROW_HEIGHT, 2);    
-}
+
 void display_wifi_connected()
 {
    //code für die Anzeige der IP-Adresse nach Verbindung zum WLAN

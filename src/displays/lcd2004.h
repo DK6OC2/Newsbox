@@ -24,12 +24,7 @@ void display_boxdata()
   lcd.setCursor(0, 2);
   lcd.print("Mac: "+MacAddr);
 }
-void display_wifi_connecting()
-{
-  //code für connecting, wenn gewünscht 
-  lcd.setCursor(0, 3);
-  lcd.print("Connecting to Wifi..");
-}
+
 void display_wifi_connected()
 {
   //code für die Anzeige der IP-Adresse nach Verbindung zum WLAN

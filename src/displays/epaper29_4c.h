@@ -31,16 +31,13 @@ void display_boxdata()
     display.print(MacAddr.c_str());
     display.display(false);
 }
-void display_wifi_connecting()
-{
-   //code für connecting, wenn gewünscht
-}
+
 void display_wifi_connected()
 {
    display.setCursor(10, 85);
    display.print("IP: ");
    display.setCursor(100, 85);
-   display.print(WiFi.localIP()); 
+   display.print(IP); 
    display.display(true); 
 }
 void display_fetch_flag()
