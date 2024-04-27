@@ -27,6 +27,10 @@ const boolean __DEBUG = true;                                 // Debug Switch - 
 #ifdef LILYGO_T_DISPLAY_S3
   #include <boards/lilygo-t-displays3.h>
 #endif
+#ifdef ESP32_1732S019
+  #include <boards/esp32-1732S019.h>
+#endif
+
 #ifdef DISPLAY_2004
   #include <displays/lcd2004.h>
 #endif
